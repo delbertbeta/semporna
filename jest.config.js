@@ -1,6 +1,6 @@
 module.exports = {
   roots: [
-    '<rootDir>/src'
+    '<rootDir>/src',
   ],
   testMatch: [
     '<rootDir>/src/tests/unit/*.{spec,test}.{vue,js,jsx,ts,tsx}',
@@ -8,6 +8,7 @@ module.exports = {
   testEnvironment: 'jsdom',
   transform: {
     '^.+\\.(vue)$': '<rootDir>/node_modules/vue-jest',
+    '^.+\\.tsx?$': 'ts-jest',
     '^.+\\.(js|jsx|mjs|cjs|ts|tsx)$': '<rootDir>/node_modules/babel-jest',
   },
   transformIgnorePatterns: [
