@@ -20,7 +20,12 @@ module.exports = {
       },
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
+        use: [{
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/],
+          },
+        }],
         exclude: /node_modules/,
       },
       // 它会应用到普通的 `.js` 文件
