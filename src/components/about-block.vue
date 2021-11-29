@@ -17,12 +17,13 @@
   position: absolute;
   box-sizing: border-box;
   width: 520px;
+  height: calc(100vh - 24px);
   padding: 48px 62px 48px 48px;
   top: 0;
   left: 0;
   bottom: 0;
-  min-height: 100vh;
   background: linear-gradient(90deg, #EDECEA 0%, rgba(237, 236, 234, 0.9) 100%);
+  z-index: 1;
 
   .logo-box {
     display: flex;
@@ -35,8 +36,8 @@
 
     .desc {
       font-weight: bold;
-      font-family: Quicksand;
       .top-text {
+        font-family: 'Quicksand';
         font-size: 54px;
         line-height: 70px;
       }
