@@ -11,7 +11,7 @@
       <img class="image" :src="item.url" />
     </div>
 
-    <modal :isShow="isShowModal" @close="isShowModal = false">
+    <modal :isShow="showImageModal" @close="showImageModal = false">
       <div class="image-preview-modal">
         <div class="left-block">
           <img class="image fade-in" :src="currentImage.url" />
@@ -34,19 +34,21 @@ export default defineComponent({
   },
   data() {
     return {
-      imageBoxWidth: 0,
       images,
-      isShowModal: false,
+      imageBoxWidth: 0,
+      showImageModal: false,
       currentImage: {},
     }
   },
   mounted() {
-    const imageBoxHeight:any = document.getElementById('image-0')?.clientHeight;
-    this.imageBoxWidth = 0.9 * imageBoxHeight;
+    if (this.images.length > 0) {
+      const imageBoxHeight:any = document.getElementById('image-0')?.clientHeight;
+      this.imageBoxWidth = 0.9 * imageBoxHeight;
+    }
   },
   methods: {
     handleImage(item: Object) {
-      this.isShowModal = true;
+      this.showImageModal = true;
       this.currentImage = item;
     }
   }

@@ -6,7 +6,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 
 module.exports = {
   mode: 'development', // 环境模式
-  entry: path.resolve(__dirname, './src/main.ts'), // 打包入口
+  entry: path.resolve(__dirname, './src/main.js'), // 打包入口
   output: {
     publicPath: '/',
     path: path.resolve(__dirname, 'dist'), // 打包出口
@@ -53,7 +53,7 @@ module.exports = {
         ],
       },
       {
-        test: /\.(png|jpg|gif|svg)$/,
+        test: /\.(png|jpg|gif)$/,
         use: [
           {
             loader: 'url-loader',
@@ -63,7 +63,6 @@ module.exports = {
             },
           },
         ],
-        exclude: [path.resolve('src/assets/svg-icons')],
       },
       {
         test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
@@ -72,7 +71,19 @@ module.exports = {
           limit: 100000,
           name: 'font/[name].[ext]',
         }
-      }
+      },
+      {
+        test: /\.svg$/,
+        use: [
+          {
+            loader: 'svg-sprite-loader',
+            options: {
+              symbolId: (filePath) =>
+                `svgicon-${path.basename(path.dirname(filePath))}-${path.basename(filePath, '.svg')}`,
+            },
+          },
+        ],
+      },
     ]
   },
   resolve: {

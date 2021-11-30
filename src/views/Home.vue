@@ -16,9 +16,6 @@ export default defineComponent({
     aboutBlock,
     imageGallery
   },
-  setup() {
-
-  }
 })
 </script>
 

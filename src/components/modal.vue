@@ -3,7 +3,7 @@
     <div class="modal-container" v-if="isShow">
       <div class="modal-mask" @click="$emit('close')"></div>
       <div class="modal-wrapper">
-        <div class="card-box" :style="{ width: `${width}px`, height: `${height}px`}">
+        <div class="card-block" :style="{ width: `${width}px`, height: `${height}px`}">
           <div class="font-box">
             <slot></slot>
           </div>
@@ -11,7 +11,7 @@
         </div>
       </div>
     </div>
-    </transition>
+  </transition>
 </template>
 
 <script lang="ts">
@@ -32,17 +32,13 @@ export default defineComponent({
       default: 700,
     }
   },
-  methods: {
-    // handleMask() {
-    //   this.$emit('close');
-    // }
-  }
 })
 </script>
 
 <style lang="less" scoped>
 .modal-container {
   min-width: 1500px;
+
   .modal-wrapper {
     position: fixed;
     z-index: 100;
@@ -53,7 +49,7 @@ export default defineComponent({
     align-items: center;
     justify-content: center;
 
-    .card-box {
+    .card-block {
       position: relative;
       box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.11);
 
