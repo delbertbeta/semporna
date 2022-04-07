@@ -3,5 +3,7 @@ import App from './App.vue';
 import store from './store';
 import router from './router';
 import SvgIconPlugin from './plugins/svg-icon/index.js';
+// import AMap from './plugins/amap.js';
 
-createApp(App).use(store).use(router).use(SvgIconPlugin).mount('#app');
+const app = createApp(App).use(store).use(router).use(SvgIconPlugin).mount('#app');
+// app.config.globalProperties.AMap = AMap;

@@ -17,6 +17,7 @@
     ]
   },
   "dependencies": {
+    "amap-js": "^2.4.0",
     "vue": "^3.2.19",
     "vue-router": "4",
     "vuex": "^4.0.2"
