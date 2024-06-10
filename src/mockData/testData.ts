@@ -1,17 +1,36 @@
+export const testImage1 = new URL(
+  "../assets/img/test1.jpg",
+  import.meta.url
+).toString();
+export const testImage2 = new URL(
+  "../assets/img/test2.jpg",
+  import.meta.url
+).toString();
+
 export const images = [
   {
-    url: "https://www.szxpc.com/zb_users/upload/2020/06/20200611222149_46512.jpg",
+    url: testImage1,
+    width: 1920,
+    height: 2772,
   },
   {
-    url: "https://www.szxpc.com/zb_users/upload/2020/06/20200611222149_46512.jpg",
+    url: testImage2,
+    width: 1920,
+    height: 1280,
   },
   {
-    url: "https://www.szxpc.com/zb_users/upload/2020/06/20200611222149_46512.jpg",
+    url: testImage1,
+    width: 1920,
+    height: 2772,
   },
   {
-    url: "https://www.szxpc.com/zb_users/upload/2020/06/20200611222149_46512.jpg",
+    url: testImage2,
+    width: 1920,
+    height: 1280,
   },
   {
-    url: "https://www.szxpc.com/zb_users/upload/2020/06/20200611222149_46512.jpg",
+    url: testImage1,
+    width: 1920,
+    height: 2772,
   },
 ];

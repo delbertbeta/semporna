@@ -1,33 +1,30 @@
 <template>
-  <div class="image-gallery">
-    <div 
-      :id="`image-${index}`"
-      v-for="(item, index) in images"
-      :key="item.url"
-      class="image-box fade-in"
-      :style="{ width: imageBoxWidth, transform: `rotate(${Math.random()*(7)-3}deg)` }"
-      @click="handleImage(item)"
-    >
-      <img class="image" :src="item.url" />
-    </div>
+  <div class="scroll-wrapper">
+    <full-screen-banner />
+    <div class="image-gallery">
+      <div :id="`image-${index}`" v-for="(item, index) in images" :key="item.url" class="image-box fade-in"
+        :style="{ transform: `rotate(${Math.random() * 6 - 3}deg)` }" @click="handleImage(item)">
+        <img class="image" :src="item.url" />
+      </div>
 
-    <modal :isShow="showImageModal" @close="showImageModal = false">
-      <div class="image-preview-modal">
-        <div class="left-block">
-          <img class="image fade-in" :src="currentImage.url" />
-          <div class="operation-bar">
-            <div class="operation-box operation-box-mr">
-              <svg-icon name="full-screen" :width="16" :height="16"></svg-icon>
-            </div>
-            <info-popover class="operation-box-mr"></info-popover>
-            <div class="operation-box">
-              <svg-icon name="unlike" :width="16" :height="16"></svg-icon>
+      <modal :isShow="showImageModal" @close="showImageModal = false">
+        <div class="image-preview-modal">
+          <div class="left-block">
+            <img class="image fade-in" :src="currentImage.url" />
+            <div class="operation-bar">
+              <div class="operation-box operation-box-mr">
+                <svg-icon name="full-screen" :width="16" :height="16"></svg-icon>
+              </div>
+              <info-popover class="operation-box-mr"></info-popover>
+              <div class="operation-box">
+                <svg-icon name="unlike" :width="16" :height="16"></svg-icon>
+              </div>
             </div>
           </div>
+          <div class="right-block"></div>
         </div>
-        <div class="right-block"></div>
-      </div>
-    </modal>
+      </modal>
+    </div>
   </div>
 </template>
 
@@ -36,12 +33,14 @@ import { defineComponent } from 'vue';
 import { images } from '../mockData/testData';
 import modal from './modal.vue';
 import infoPopover from './info-popover.vue';
+import FullScreenBanner from './full-screen-banner.vue';
 
 export default defineComponent({
   name: 'image-gallery',
   components: {
     modal,
     infoPopover,
+    FullScreenBanner,
   },
   data() {
     return {
@@ -53,7 +52,7 @@ export default defineComponent({
   },
   mounted() {
     if (this.images.length > 0) {
-      const imageBoxHeight:any = document.getElementById('image-0')?.clientHeight;
+      const imageBoxHeight: any = document.getElementById('image-0')?.clientHeight;
       this.imageBoxWidth = 0.9 * imageBoxHeight;
     }
   },
@@ -67,36 +66,43 @@ export default defineComponent({
 </script>
 
 <style lang="less">
+.scroll-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
 .image-gallery {
   box-sizing: border-box;
-  padding: 50px 0 50px 300px;
-  height: calc(100vh - 220px);
-  display: flex;
-  flex-direction: column;
-  flex-wrap: wrap;
-  overflow-x: auto;
+  height: 100%;
+  padding: 80px 80px 80px 440px;
+  display: grid;
+  grid-auto-columns: auto;
+  grid-template-rows: 1fr 1fr;
+  grid-auto-flow: column;
+  grid-row-gap: 8%;
+  grid-column-gap: 5vw;
 
   .image-box {
-    display: inline-block;
-    height: calc(50% - 30px);
+    cursor: pointer;
+    position: relative;
+    aspect-ratio: 350 / 380;
+    height: 100%;
     background-color: #F9F9F9;
     border-radius: 4px;
-    padding: 30px;
     box-sizing: border-box;
-    margin-bottom: 30px;
-    margin-right: 70px;
-    transform: rotate(3deg);
   }
 }
 
 .image {
-  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 24px;
   height: 100%;
+  width: 100%;
+  box-sizing: border-box;
   object-fit: cover;
-}
-// 隐藏横向滚动条
-.image-gallery::-webkit-scrollbar {
-  width: 0 !important
 }
 
 .image-preview-modal {

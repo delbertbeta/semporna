@@ -10,7 +10,13 @@
     <div class="line"></div>
     <div class="about-text pointer" @click="showAboutModal = true">
       关于这里
-      <svg-icon name="link" :width="18" :height="18" style="margin-left: 12px"></svg-icon>
+      <svg-icon name="link" :width="16" :height="16" style="margin-left: 8px"></svg-icon>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item active">2024</div>
+      <div class="timeline-item">2023</div>
+      <div class="timeline-item">2022</div>
     </div>
 
     <modal :isShow="showAboutModal" @close="showAboutModal = false">
@@ -45,13 +51,15 @@ export default defineComponent({
 <style lang="less" scoped>
 .about-block {
   position: absolute;
-  width: 520px;
+  box-sizing: border-box;
+  width: 360px;
   height: 100%;
-  padding: 48px 48px 48px 48px;
+  padding: 42px;
   top: 0;
   left: 0;
   bottom: 0;
-  background: linear-gradient(90deg, #EDECEA 0%, rgba(237, 236, 234, 0.9) 100%);
+  background: linear-gradient(90deg, #EDECEA 0%, rgba(237, 236, 234, 0.6) 100%);
+  backdrop-filter: blur(32px);
   z-index: 1;
 
   .logo-box {
@@ -59,36 +67,55 @@ export default defineComponent({
     align-items: center;
 
     .logo {
-      width: 140px;
-      height: 140px;
-      margin-right: 32px;
+      width: 80px;
+      height: 80px;
+      margin-right: 24px;
     }
 
     .desc {
       font-weight: bold;
 
       .top-text {
-        font-size: 54px;
+        font-size: 36px;
         font-weight: 700;
       }
 
       .bottom-text {
-        font-size: 26px;
+        font-size: 20px;
       }
     }
   }
 
   .line {
-    width: 260px;
-    border: 1px solid #757C8A;
+    width: 220px;
+    border: 1.5px solid #757C8A;
     margin: 24px 0;
   }
 
   .about-text {
     display: flex;
     align-items: center;
-    font-size: 24px;
-    font-weight: 500;
+    font-size: 16px;
+    font-weight: normal;
+  }
+
+  .timeline {
+    position: absolute;
+    left: 42px;
+    bottom: 42px;
+  }
+
+  .timeline-item {
+    font-size: 16px;
+    margin-top: 8px;
+    cursor: pointer;
+    color: #D3D3D5;
+
+    font-weight: bold;
+
+    &.active {
+      color: #121315;
+    }
   }
 
   .about-modal {

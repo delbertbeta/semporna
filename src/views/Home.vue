@@ -21,9 +21,21 @@ export default defineComponent({
 
 <style lang="less" scoped>
 .home-container {
-  padding: 100px 0 88px 254px;
+  height: 100%;
   position: relative;
-  background-image: url('../assets/img/bg-pattern.png');
-  background-repeat: repeat;
+
+  &:before {
+    content: ' ';
+    display: block;
+    position: absolute;
+    z-index: -1;
+    height: 100%;
+    left: 0;
+    width: 100%;
+    top: 0;
+    background-image: url('../assets/img/bg-pattern.png');
+    background-repeat: repeat;
+    opacity: 0.32;
+  }
 }
 </style>
