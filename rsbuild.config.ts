@@ -12,7 +12,7 @@ export default defineConfig({
   },
   source: {
     entry: {
-      index: "./src/main.js",
+      index: "./src/main.ts",
     },
   },
   tools: {
