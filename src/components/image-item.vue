@@ -1,11 +1,27 @@
 <template>
-  <div class="image-box fade-in">
+  <div class="image-box fade-in" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <img class="image" :src="item.url" />
+    <Transition>
+      <image-item-hover-meta v-if="hover" />
+    </Transition>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue';
+import ImageItemHoverMeta from './image-item-hover-meta.vue';
 defineProps<{ item: { url: string } }>();
+
+const hover = ref(false);
+
+const handleMouseEnter = () => {
+  hover.value = true;
+}
+
+
+const handleMouseLeave = () => {
+  hover.value = false;
+}
 
 </script>
 
