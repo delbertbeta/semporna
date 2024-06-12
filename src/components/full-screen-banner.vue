@@ -1,33 +1,47 @@
 <template>
   <div class="full-screen-banner fade-in">
-    <div class="full-screen-banner-slider">
-      <div class="full-screen-banner-slider-item prev">
-        <div class="info-tag">
-          <div class="into-year">2024/08</div>
-          <!-- <div class="into-bar"><span class="into-pos">广州</span><span class="info-des">test</span></div> -->
+    <swiper class="full-screen-banner-slider" :space-between="-36" :autoplay="{ delay: 10000 }" :modules="modules" loop
+      @autoplayTimeLeft="onAutoplayTimeLeft" @swiper="handleSwiper" :speed="720" :simulate-touch="false"
+      :loop-additional-slides="3">
+      <swiper-slide>
+        <div class=" full-screen-banner-slider-item">
+          <div class="info-tag">
+            <div class="into-year">2024/08</div>
+            <!-- <div class="into-bar"><span class="into-pos">广州</span><span class="info-des">test</span></div> -->
+          </div>
+          <img class="full-screen-banner-img" :src="testImage2" />
         </div>
-        <img class="full-screen-banner-img prev" :src="testImage2" />
-      </div>
-      <div class="full-screen-banner-slider-item">
-        <div class="info-tag">
-          <div class="into-year">2024/08</div>
+      </swiper-slide>
+      <swiper-slide>
+        <div class="full-screen-banner-slider-item">
+          <div class="info-tag">
+            <div class="into-year">2024/08</div>
+          </div>
+          <img class="full-screen-banner-img" :src="testImage2" />
         </div>
-        <img class="full-screen-banner-img" :src="testImage2" />
-      </div>
+      </swiper-slide>
 
-      <div class="full-screen-banner-slider-item next">
-        <div class="info-tag">
-          <div class="into-year">2024/08</div>
+      <swiper-slide>
+        <div class="full-screen-banner-slider-item">
+          <div class="info-tag">
+            <div class="into-year">2024/08</div>
+          </div>
+          <img class="full-screen-banner-img" :src="testImage1" />
         </div>
-        <img class="full-screen-banner-img" :src="testImage1" />
-      </div>
-    </div>
+      </swiper-slide>
+
+      <template #container-end>
+        <div class="autoplay-progress">
+          <div class="autoplay-progress-bar" ref="progressBar" />
+        </div>
+      </template>
+
+    </swiper>
     <div class="left-arrow">
-      <svg-icon name="left" :width="16" :height="16" class="arrow-icon" />
-
+      <svg-icon name="left" :width="16" :height="16" class="arrow-icon" @click="slidePrev" />
     </div>
     <div class="right-arrow">
-      <svg-icon name="right" :width="16" :height="16" class="arrow-icon" />
+      <svg-icon name="right" :width="16" :height="16" class="arrow-icon" @click="slideNext" />
     </div>
     <div class="scroll-down">
       <div class="scroll-down-icon" />
@@ -36,9 +50,39 @@
 </template>
 
 <script setup lang="ts">
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Swiper as SwiperInner } from 'swiper';
+import { throttle } from 'lodash';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
+
 import { testImage1 } from '@/mockData/testData';
 import { testImage2 } from '@/mockData/testData';
+import { ref } from 'vue';
 
+const modules = [Autoplay];
+
+const swiperRef = ref<SwiperInner>();
+const progressBar = ref<HTMLDivElement>();
+
+const handleSwiper = (swiper: SwiperInner) => {
+  swiperRef.value = swiper;
+}
+
+const onAutoplayTimeLeft = throttle((_swiper: SwiperInner, _timeLeft: number, percentage: number) => {
+  if (!progressBar.value) {
+    return;
+  }
+  progressBar.value.style.width = `${(1 - percentage) * 100}%`;
+}, 100, { trailing: true, leading: true });
+
+const slideNext = () => {
+  swiperRef.value?.slideNext();
+}
+
+const slidePrev = () => {
+  swiperRef.value?.slidePrev();
+}
 </script>
 
 <style lang="less">
@@ -50,25 +94,32 @@ import { testImage2 } from '@/mockData/testData';
   position: relative;
 }
 
-.full-screen-banner-slider-item {
+.full-screen-banner-slider {
+  z-index: 0;
+  overflow: visible;
   position: absolute;
-  top: 200px;
-  left: 428px;
-  right: 72px;
-  bottom: 100px;
+  top: 140px;
+  left: 420px;
+  right: 0;
+  bottom: 80px;
+}
 
-  &.prev {
-    transform: translateX(calc(-100% - 36px));
-  }
-
-  &.next {
-    transform: translateX(calc(100% + 36px));
-  }
+.full-screen-banner-slider-item {
+  height: 100%;
+  width: calc(100% - 64px);
 
   &>.full-screen-banner-img {
     height: 100%;
     width: 100%;
     object-fit: cover;
+    border-radius: 4px;
+  }
+}
+
+.swiper-slide-active {
+  .info-tag {
+    opacity: 1;
+    transform: translateY(0px);
   }
 }
 
@@ -76,6 +127,10 @@ import { testImage2 } from '@/mockData/testData';
   position: absolute;
   top: -64px;
   left: 32px;
+  opacity: 0;
+  transform: translateY(20px);
+
+  transition: opacity 0.42s ease-in-out 0.3s, transform 0.42s ease-in-out 0.3s;
 
   .into-year {
     font-size: 96px;
@@ -157,5 +212,30 @@ import { testImage2 } from '@/mockData/testData';
 .right-arrow {
   left: unset;
   right: 18px;
+}
+
+.swiper-wrapper {
+  transition-timing-function: cubic-bezier(.76, .09, .215, 1);
+}
+
+.autoplay-progress {
+  background-color: rgba(0, 0, 0, 0.1);
+  position: absolute;
+  top: -20px;
+  right: 64px;
+  height: 4px;
+  width: 80px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.autoplay-progress-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: width 0.1s ease;
 }
 </style>
