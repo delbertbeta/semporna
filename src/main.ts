@@ -1,14 +1,16 @@
 import { createApp } from "vue";
 import MasonryWall from "@yeger/vue-masonry-wall";
 import App from "./App.vue";
-import store from "./store";
+import { createPinia } from "pinia";
 import router from "./router";
 import SvgIconPlugin from "./plugins/svg-icon";
 // import AMap from './plugins/amap.js';
 
+const pinia = createPinia();
+
 const app = createApp(App)
   .use(MasonryWall)
-  .use(store)
+  .use(pinia)
   .use(router)
   .use(SvgIconPlugin)
   .mount("#root");

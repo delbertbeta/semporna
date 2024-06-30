@@ -2,21 +2,16 @@
   <div class="home-container">
     <about-block></about-block>
     <image-gallery></image-gallery>
+    <about-modal />
+    <album-modal />
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import aboutBlock from '../components/about-block.vue';
-import imageGallery from '../components/image-gallery.vue';
-
-export default defineComponent({
-  name: 'home',
-  components: {
-    aboutBlock,
-    imageGallery
-  },
-})
+<script setup lang="ts">
+import AboutBlock from '../components/about-block.vue';
+import ImageGallery from '../components/image-gallery.vue';
+import AboutModal from '../components/about-modal.vue';
+import AlbumModal from '../components/album-modal.vue';
 </script>
 
 <style lang="less" scoped>

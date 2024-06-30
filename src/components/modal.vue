@@ -1,38 +1,51 @@
 <template>
-  <transition name="modal-fade" appear>
-    <div class="modal-container" v-if="isShow">
+  <transition name="modal" type="animation" :duration="{ enter: 450, leave: 400 }" @after-enter="handleAfterEnter"
+    @after-leave="handleAfterLeave">
+    <div class="modal-container" v-if="visible">
       <div class="modal-mask" @click="$emit('close')"></div>
-      <div class="modal-wrapper">
-        <div class="card-block" :style="{ width: `${width}px`, height: `${height}px`}">
-          <div class="font-box">
+      <div class="modal-wrapper" :class="{ [`size-${size}`]: true }">
+        <div class="card-block">
+          <div class="front-box">
+            <transition name="fade-in-out">
+              <div class="loader-container" v-if="realLoading">
+                <div class="loader" />
+              </div>
+            </transition>
             <slot></slot>
           </div>
-          <div class="back-box"></div>
+          <transition name="rotate" type="animation">
+            <div class="back-box" v-if="!realLoading" />
+          </transition>
         </div>
       </div>
     </div>
   </transition>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { computed, ref } from 'vue';
 
-export default defineComponent({
-  props: {
-    isShow: {
-      type: Boolean,
-      default: false,
-    },
-    width: {
-      type: Number,
-      default: 1264,
-    },
-    height: {
-      type: Number,
-      default: 700,
-    }
-  },
-})
+const props = defineProps<{
+  visible: boolean;
+  size: 'small' | 'large' | 'middle';
+  loading?: boolean;
+}>();
+defineEmits<{
+  close: [];
+}>();
+
+const entered = ref(false);
+
+const realLoading = computed(() => !entered.value || props.loading);
+
+const handleAfterEnter = () => {
+  entered.value = true;
+}
+
+const handleAfterLeave = () => {
+  entered.value = false;
+}
+
 </script>
 
 <style lang="less" scoped>
@@ -49,11 +62,30 @@ export default defineComponent({
     align-items: center;
     justify-content: center;
 
+    &.size-small {
+      height: 50%;
+      width: 50%;
+    }
+
+    &.size-middle {
+      height: 70%;
+      width: 70%;
+    }
+
+
+    &.size-large {
+      height: 80%;
+      width: 80%;
+    }
+
     .card-block {
       position: relative;
       box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.11);
+      height: 100%;
+      width: 100%;
 
-      .font-box {
+
+      .front-box {
         position: absolute;
         top: 0;
         width: 100%;
@@ -61,6 +93,8 @@ export default defineComponent({
         background-color: #fff;
         box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.11);
         z-index: 101;
+        border-radius: 4px;
+        overflow: hidden;
       }
 
       .back-box {
@@ -68,9 +102,11 @@ export default defineComponent({
         top: 0;
         width: 100%;
         height: 100%;
-        background-color: #fff;
-        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.11);
+        background-color: #f2f2f2;
         transform: rotate(3deg);
+        box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.11);
+        border-radius: 4px;
+        overflow: hidden;
       }
     }
   }
@@ -81,17 +117,165 @@ export default defineComponent({
     right: 0;
     bottom: 0;
     left: 0;
-    background: rgba(223, 223, 223, 0.85);
+    background: rgba(223, 223, 223, 0.6);
     z-index: 2;
+    opacity: 1;
+    backdrop-filter: blur(32px);
   }
 }
-@keyframes modal-fade {
-  from {
+
+.modal-enter-active,
+.modal-leave-active {
+  .modal-mask {
+    transition: opacity 0.3s ease-in-out;
+  }
+}
+
+.modal-enter-active {
+  .card-block {
+    animation: bounce-in 0.45s cubic-bezier(.58, -0.01, .24, 1.5) both;
+  }
+}
+
+.modal-leave-active {
+  .card-block {
+    animation: bounce-out 0.4s cubic-bezier(.42, 0, 1, .31) both;
+  }
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  .modal-mask {
     opacity: 0;
   }
+}
 
-  to {
+.fade-in-out-enter-to,
+.fade-in-out-leave-from {
+  opacity: 1;
+}
+
+.fade-in-out-enter-active,
+.fade-in-out-leave-active {
+  transition: opacity 0.3s ease-in-out;
+}
+
+.fade-in-out-enter-from,
+.fade-in-out-leave-to {
+  opacity: 0;
+}
+
+.rotate-enter-active {
+  animation: rotate 0.3s ease-in-out both;
+}
+
+.rotate-leave-active {
+  animation: rotate 0.3s ease-in-out both reverse;
+}
+
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: translateY(60%);
+  }
+
+  100% {
     opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bounce-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(60%);
+  }
+}
+
+.loader-container {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #fff;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 65px;
+  aspect-ratio: 1;
+  position: relative;
+}
+
+.loader:before,
+.loader:after {
+  content: "";
+  position: absolute;
+  border-radius: 50px;
+  box-shadow: 0 0 0 3px inset #000;
+  animation: l4 2.5s infinite;
+}
+
+.loader:after {
+  animation-delay: -1.25s;
+}
+
+@keyframes l4 {
+  0% {
+    inset: 0 35px 35px 0;
+  }
+
+  12.5% {
+    inset: 0 35px 0 0;
+  }
+
+  25% {
+    inset: 35px 35px 0 0;
+  }
+
+  37.5% {
+    inset: 35px 0 0 0;
+  }
+
+  50% {
+    inset: 35px 0 0 35px;
+  }
+
+  62.5% {
+    inset: 0 0 0 35px;
+  }
+
+  75% {
+    inset: 0 0 35px 35px;
+  }
+
+  87.5% {
+    inset: 0 0 35px 0;
+  }
+
+  100% {
+    inset: 0 35px 35px 0;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0);
+  }
+
+  100% {
+    transform: rotate(3deg);
   }
 }
 </style>

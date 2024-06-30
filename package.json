@@ -19,10 +19,10 @@
     "@babel/runtime": "^7.24.7",
     "@yeger/vue-masonry-wall": "^5.0.10",
     "amap-js": "^2.4.0",
+    "pinia": "^2.1.7",
     "swiper": "^11.1.4",
     "vue": "^3.4.27",
-    "vue-router": "4",
-    "vuex": "^4.0.2"
+    "vue-router": "4"
   },
   "devDependencies": {
     "@rsbuild/core": "^0.7.4",

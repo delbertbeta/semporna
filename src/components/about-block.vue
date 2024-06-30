@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="line"></div>
-    <div class="about-text pointer" @click="showAboutModal = true">
+    <div class="about-text pointer" @click="openAboutModal">
       关于这里
       <svg-icon name="link" :width="16" :height="16" style="margin-left: 8px"></svg-icon>
     </div>
@@ -18,33 +18,15 @@
       <div class="timeline-item">2023</div>
       <div class="timeline-item">2022</div>
     </div>
-
-    <modal :isShow="showAboutModal" @close="showAboutModal = false">
-      <div class="about-modal">
-        <div class="title">关于这里</div>
-        <div class="desc">{{ desc }}</div>
-        <div class="signature">Inspired by Petar Zeman</div>
-        <div class="footer pointer" @click="showAboutModal = false">已阅</div>
-      </div>
-    </modal>
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import modal from './modal.vue';
+<script setup lang="ts">
+import { useAppStore } from '@/store';
 
-export default defineComponent({
-  components: {
-    modal,
-  },
-  data() {
-    return {
-      showAboutModal: false,
-      desc: '滚滚长江东逝水，浪花淘尽英雄。是非成败转头空，青山依旧在，几度夕阳红。白发渔樵江渚上，惯看秋月春风。一壶浊酒喜相逢，古今多少事， 都付笑谈中。滚滚长江东逝水，浪花淘尽英雄。是非成败转头空，青山依旧在，几度夕阳红。白发渔樵江渚上，惯看秋月春风。一壶浊酒喜相逢，古今多少事， 都付笑谈中。滚滚长江东逝水，浪花淘尽英雄。是非成败转头空，青山依旧在，几度夕阳红。白发渔樵江渚上，惯看秋月春风。一壶浊酒喜相逢，古今多少事， 都付笑谈中。'
-    }
-  }
-})
+const store = useAppStore();
+
+const { openAboutModal } = store;
 </script>
 
 
@@ -115,42 +97,6 @@ export default defineComponent({
 
     &.active {
       color: #121315;
-    }
-  }
-
-  .about-modal {
-    padding: 0 80px;
-    color: #121315;
-
-    .title {
-      width: 174px;
-      font-weight: 600;
-      font-size: 42px;
-      line-height: 65px;
-      border-bottom: 1px solid #000000;
-      margin: 90px 0 30px 0;
-    }
-
-    .desc {
-      font-size: 18px;
-      line-height: 48px;
-      text-decoration: underline #999;
-      text-underline-offset: 15px;
-    }
-
-    .signature {
-      font-size: 18px;
-      line-height: 48px;
-    }
-
-    .footer {
-      position: absolute;
-      bottom: 85px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-weight: 600;
-      font-size: 24px;
-      line-height: 34px;
     }
   }
 }

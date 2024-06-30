@@ -1,5 +1,5 @@
 <template>
-  <div class="image-box fade-in" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
+  <div @click="handleItemClick" class="image-box fade-in" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
     <img class="image" :src="item.url" />
     <Transition>
       <image-item-hover-meta v-if="hover" />
@@ -10,7 +10,12 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import ImageItemHoverMeta from './image-item-hover-meta.vue';
+import { useAppStore } from '@/store';
+
 defineProps<{ item: { url: string } }>();
+
+const store = useAppStore();
+const { openAlbumModal } = store;
 
 const hover = ref(false);
 
@@ -18,9 +23,12 @@ const handleMouseEnter = () => {
   hover.value = true;
 }
 
-
 const handleMouseLeave = () => {
   hover.value = false;
+}
+
+const handleItemClick = () => {
+  openAlbumModal();
 }
 
 </script>
