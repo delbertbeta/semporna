@@ -12,14 +12,15 @@
       </div>
       <svg-icon name="stamp-bg" class="stamp-bg" />
     </div>
-    <svg-icon name="stamp" class="stamp" :height="120" :width="120" />
+    <svg-icon name="stamp.min" class="stamp" :height="120" :width="120" />
   </div>
 </template>
 
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 
 <style lang="less">
+@import "../assets/less/variant.less";
+
 .image-item-hover-meta {
   position: absolute;
   top: 0;
@@ -80,7 +81,7 @@
   margin-left: @margin;
   font-size: 28px;
   font-weight: bold;
-  color: #2b4e20;
+  color: @ui-color-primary;
 }
 
 .stamp-year {
@@ -88,7 +89,7 @@
   font-size: 14px;
   margin-left: @margin;
   font-weight: bold;
-  color: #618A54;
+  color: @ui-color-secondary;
   margin-bottom: 12px;
 }
 
@@ -114,7 +115,7 @@
   height: 2px;
   margin-left: @margin;
   margin-right: @margin;
-  background-color: #618A54;
+  background-color: @ui-color-secondary;
   margin-top: 4px;
 }
 
@@ -123,7 +124,7 @@
   font-size: 12px;
   margin-left: @margin;
   font-weight: bold;
-  color: #618A54;
+  color: @ui-color-secondary;
 }
 
 .stamp-from-city {
@@ -131,7 +132,7 @@
   font-size: 14px;
   margin-left: @margin;
   font-weight: bold;
-  color: #2b4e20;
+  color: @ui-color-primary;
 }
 
 .stamp-from-pos {
@@ -139,7 +140,7 @@
   font-size: 16px;
   margin-left: @margin;
   font-weight: bold;
-  color: #2b4e20;
+  color: @ui-color-primary;
   margin-bottom: 8px;
 }
 </style>

@@ -1,10 +1,19 @@
 <template>
   <div class="full-screen-banner fade-in">
-    <swiper class="full-screen-banner-slider" :space-between="-36" :autoplay="{ delay: 10000 }" :modules="modules" loop
-      @autoplayTimeLeft="onAutoplayTimeLeft" @swiper="handleSwiper" :speed="720" :simulate-touch="false"
-      :loop-additional-slides="3">
+    <swiper
+      class="full-screen-banner-slider"
+      :space-between="-36"
+      :autoplay="{ delay: 10000 }"
+      :modules="modules"
+      loop
+      @autoplayTimeLeft="onAutoplayTimeLeft"
+      @swiper="handleSwiper"
+      :speed="720"
+      :simulate-touch="false"
+      :loop-additional-slides="3"
+    >
       <swiper-slide>
-        <div class=" full-screen-banner-slider-item">
+        <div class="full-screen-banner-slider-item">
           <div class="info-tag">
             <div class="into-year">2024/08</div>
             <!-- <div class="into-bar"><span class="into-pos">广州</span><span class="info-des">test</span></div> -->
@@ -35,13 +44,24 @@
           <div class="autoplay-progress-bar" ref="progressBar" />
         </div>
       </template>
-
     </swiper>
     <div class="left-arrow">
-      <svg-icon name="left" :width="16" :height="16" class="arrow-icon" @click="slidePrev" />
+      <svg-icon
+        name="left"
+        :width="16"
+        :height="16"
+        class="arrow-icon"
+        @click="slidePrev"
+      />
     </div>
     <div class="right-arrow">
-      <svg-icon name="right" :width="16" :height="16" class="arrow-icon" @click="slideNext" />
+      <svg-icon
+        name="right"
+        :width="16"
+        :height="16"
+        class="arrow-icon"
+        @click="slideNext"
+      />
     </div>
     <div class="scroll-down">
       <div class="scroll-down-icon" />
@@ -50,15 +70,15 @@
 </template>
 
 <script setup lang="ts">
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { Swiper as SwiperInner } from 'swiper';
-import { throttle } from 'lodash';
-import { Autoplay } from 'swiper/modules';
-import 'swiper/css';
+import { Swiper, SwiperSlide } from "swiper/vue";
+import { Swiper as SwiperInner } from "swiper";
+import { throttle } from "lodash";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
 
-import { testImage1 } from '@/mockData/testData';
-import { testImage2 } from '@/mockData/testData';
-import { ref } from 'vue';
+import { testImage1 } from "@/mockData/testData";
+import { testImage2 } from "@/mockData/testData";
+import { ref } from "vue";
 
 const modules = [Autoplay];
 
@@ -67,25 +87,31 @@ const progressBar = ref<HTMLDivElement>();
 
 const handleSwiper = (swiper: SwiperInner) => {
   swiperRef.value = swiper;
-}
+};
 
-const onAutoplayTimeLeft = throttle((_swiper: SwiperInner, _timeLeft: number, percentage: number) => {
-  if (!progressBar.value) {
-    return;
-  }
-  progressBar.value.style.width = `${(1 - percentage) * 100}%`;
-}, 100, { trailing: true, leading: true });
+const onAutoplayTimeLeft = throttle(
+  (_swiper: SwiperInner, _timeLeft: number, percentage: number) => {
+    if (!progressBar.value) {
+      return;
+    }
+    progressBar.value.style.width = `${(1 - percentage) * 100}%`;
+  },
+  100,
+  { trailing: true, leading: true }
+);
 
 const slideNext = () => {
   swiperRef.value?.slideNext();
-}
+};
 
 const slidePrev = () => {
   swiperRef.value?.slidePrev();
-}
+};
 </script>
 
 <style lang="less">
+@import "../assets/less/variant.less";
+
 .full-screen-banner {
   height: 100%;
   width: 100%;
@@ -108,7 +134,7 @@ const slidePrev = () => {
   height: 100%;
   width: calc(100% - 64px);
 
-  &>.full-screen-banner-img {
+  & > .full-screen-banner-img {
     height: 100%;
     width: 100%;
     object-fit: cover;
@@ -145,7 +171,7 @@ const slidePrev = () => {
   .into-pos {
     padding: 4px 12px;
     display: inline-block;
-    background-color: #2B4E20;
+    background-color: @ui-color-secondary;
     color: white;
   }
 
@@ -215,7 +241,7 @@ const slidePrev = () => {
 }
 
 .swiper-wrapper {
-  transition-timing-function: cubic-bezier(.76, .09, .215, 1);
+  transition-timing-function: cubic-bezier(0.76, 0.09, 0.215, 1);
 }
 
 .autoplay-progress {

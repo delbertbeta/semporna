@@ -7,10 +7,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'svg-icon',
+  name: "svg-icon",
   props: {
     name: {
       type: String,
@@ -26,11 +26,11 @@ export default defineComponent({
     },
     fill: {
       type: String,
-      default: '',
+      default: "",
     },
     hoverFill: {
       type: String,
-      default: '',
+      default: "",
     },
   },
   computed: {
@@ -49,10 +49,9 @@ export default defineComponent({
     },
     iconViewBox() {
       return this.icon.viewBox;
-    }
-
-  }
-})
+    },
+  },
+});
 </script>
 
 <style lang="less" scoped>
