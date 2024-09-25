@@ -133,13 +133,13 @@ const handleAfterLeave = () => {
 
 .modal-enter-active {
   .card-block {
-    animation: bounce-in 0.45s cubic-bezier(.58, -0.01, .24, 1.5) both;
+    animation: bounce-in 0.45s cubic-bezier(.58, -0.01, .24, 1.3) both;
   }
 }
 
 .modal-leave-active {
   .card-block {
-    animation: bounce-out 0.4s cubic-bezier(.42, 0, 1, .31) both;
+    animation: bounce-out 0.3s cubic-bezier(.42, 0, 1, .31) both;
   }
 }
 
@@ -193,7 +193,7 @@ const handleAfterLeave = () => {
 
   100% {
     opacity: 0;
-    transform: translateY(60%);
+    transform: translateY(20%);
   }
 }
 
