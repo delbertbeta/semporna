@@ -45,23 +45,11 @@
         </div>
       </template>
     </swiper>
-    <div class="left-arrow">
-      <svg-icon
-        name="left"
-        :width="16"
-        :height="16"
-        class="arrow-icon"
-        @click="slidePrev"
-      />
+    <div class="left-arrow" @click="slidePrev">
+      <svg-icon name="left" :width="16" :height="16" class="arrow-icon" />
     </div>
-    <div class="right-arrow">
-      <svg-icon
-        name="right"
-        :width="16"
-        :height="16"
-        class="arrow-icon"
-        @click="slideNext"
-      />
+    <div class="right-arrow" @click="slideNext">
+      <svg-icon name="right" :width="16" :height="16" class="arrow-icon" />
     </div>
     <div class="scroll-down">
       <div class="scroll-down-icon" />
@@ -70,15 +58,15 @@
 </template>
 
 <script setup lang="ts">
-import { Swiper, SwiperSlide } from "swiper/vue";
-import { Swiper as SwiperInner } from "swiper";
-import { throttle } from "lodash";
-import { Autoplay } from "swiper/modules";
-import "swiper/css";
+import { Swiper, SwiperSlide } from 'swiper/vue';
+import { Swiper as SwiperInner } from 'swiper';
+import { throttle } from 'lodash';
+import { Autoplay } from 'swiper/modules';
+import 'swiper/css';
 
-import { testImage1 } from "@/mockData/testData";
-import { testImage2 } from "@/mockData/testData";
-import { ref } from "vue";
+import { testImage1 } from '@/mockData/testData';
+import { testImage2 } from '@/mockData/testData';
+import { ref } from 'vue';
 
 const modules = [Autoplay];
 
@@ -109,8 +97,8 @@ const slidePrev = () => {
 };
 </script>
 
-<style lang="less">
-@import "../assets/less/variant.less";
+<style lang="less" scoped>
+@import '../assets/less/variant.less';
 
 .full-screen-banner {
   height: 100%;

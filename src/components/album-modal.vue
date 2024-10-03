@@ -3,7 +3,7 @@
     <div class="album-modal">
       <div class="image-container">
         <album-modal-toolbar />
-        <img class="album-modal-image" :src="testImage1" />
+        <album-modal-slider />
       </div>
       <div class="info-container">
         <album-modal-info />
@@ -13,12 +13,12 @@
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from "../store";
-import { storeToRefs } from "pinia";
-import Modal from "./modal.vue";
-import AlbumModalToolbar from "./album-modal-toolbar.vue";
-import AlbumModalInfo from "./album-modal-info.vue";
-import { testImage1 } from "@/mockData/testData";
+import { useAppStore } from '../store';
+import { storeToRefs } from 'pinia';
+import Modal from './modal.vue';
+import AlbumModalToolbar from './album-modal-toolbar.vue';
+import AlbumModalInfo from './album-modal-info.vue';
+import AlbumModalSlider from './album-modal-slider.vue';
 
 const store = useAppStore();
 const { closeAlbumModal } = store;

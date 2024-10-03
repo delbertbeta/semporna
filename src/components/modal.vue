@@ -1,6 +1,11 @@
 <template>
-  <transition name="modal" type="animation" :duration="{ enter: 450, leave: 400 }" @after-enter="handleAfterEnter"
-    @after-leave="handleAfterLeave">
+  <transition
+    name="modal"
+    type="animation"
+    :duration="{ enter: 450, leave: 400 }"
+    @after-enter="handleAfterEnter"
+    @after-leave="handleAfterLeave"
+  >
     <div class="modal-container" v-if="visible">
       <div class="modal-mask" @click="$emit('close')"></div>
       <div class="modal-wrapper" :class="{ [`size-${size}`]: true }">
@@ -40,12 +45,11 @@ const realLoading = computed(() => !entered.value || props.loading);
 
 const handleAfterEnter = () => {
   entered.value = true;
-}
+};
 
 const handleAfterLeave = () => {
   entered.value = false;
-}
-
+};
 </script>
 
 <style lang="less" scoped>
@@ -72,7 +76,6 @@ const handleAfterLeave = () => {
       width: 70%;
     }
 
-
     &.size-large {
       height: 80%;
       width: 80%;
@@ -83,7 +86,6 @@ const handleAfterLeave = () => {
       box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.11);
       height: 100%;
       width: 100%;
-
 
       .front-box {
         position: absolute;
@@ -133,13 +135,13 @@ const handleAfterLeave = () => {
 
 .modal-enter-active {
   .card-block {
-    animation: bounce-in 0.45s cubic-bezier(.58, -0.01, .24, 1.3) both;
+    animation: bounce-in 0.45s cubic-bezier(0.58, -0.01, 0.24, 1.3) both;
   }
 }
 
 .modal-leave-active {
   .card-block {
-    animation: bounce-out 0.3s cubic-bezier(.42, 0, 1, .31) both;
+    animation: bounce-out 0.3s cubic-bezier(0.42, 0, 1, 0.31) both;
   }
 }
 
@@ -200,7 +202,7 @@ const handleAfterLeave = () => {
 .loader-container {
   width: 100%;
   height: 100%;
-  z-index: 1;
+  z-index: 99;
   position: absolute;
   top: 0;
   left: 0;
@@ -220,7 +222,7 @@ const handleAfterLeave = () => {
 
 .loader:before,
 .loader:after {
-  content: "";
+  content: '';
   position: absolute;
   border-radius: 50px;
   box-shadow: 0 0 0 3px inset #000;

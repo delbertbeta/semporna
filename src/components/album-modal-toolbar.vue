@@ -6,16 +6,26 @@
     <Popover v-slot="{ open }">
       <!-- Use the `open` state to conditionally change the direction of the chevron icon. -->
       <PopoverButton class="outline-none">
-        <div class="button" :class="{ 'active': open }">
-          <ExclamationCircleIcon class=" size-5" />
+        <div class="button" :class="{ active: open }">
+          <ExclamationCircleIcon class="size-5" />
         </div>
       </PopoverButton>
-      <transition enter-active-class="transition duration-200 ease-out" enter-from-class="translate-y-1 opacity-0"
-        enter-to-class="translate-y-0 opacity-100" leave-active-class="transition duration-150 ease-in"
-        leave-from-class="translate-y-0 opacity-100" leave-to-class="translate-y-1 opacity-0">
-        <PopoverPanel class="absolute left-1/2 z-10 mt-3 -translate-x-3/4 p-4 w-80 rounded-lg bg-white-transparent-1">
+      <transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="translate-y-1 opacity-0"
+        enter-to-class="translate-y-0 opacity-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="translate-y-0 opacity-100"
+        leave-to-class="translate-y-1 opacity-0"
+      >
+        <PopoverPanel
+          class="absolute left-1/2 z-10 mt-3 -translate-x-3/4 p-4 w-80 rounded-lg bg-white-transparent-1"
+        >
           <div class="rounded-lg bg-white w-full overflow-hidden">
-            <div class="text-text-main bg-green-transparent-1 h-7 px-3 font-bold w-full leading-7">2021/11/21 13:53
+            <div
+              class="text-text-main bg-green-transparent-1 h-7 px-3 font-bold w-full leading-7"
+            >
+              2021/11/21 13:53
             </div>
             <div class="flex flex-row items-start py-2 px-3">
               <ViewfinderCircleIcon class="size-4 mt-0.5" />
@@ -44,15 +54,21 @@
 </template>
 
 <script setup lang="ts">
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue'
-import { ArrowsPointingOutIcon, ExclamationCircleIcon, HeartIcon, ViewfinderCircleIcon } from '@heroicons/vue/24/outline';
+import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
+import {
+  ArrowsPointingOutIcon,
+  ExclamationCircleIcon,
+  HeartIcon,
+  ViewfinderCircleIcon,
+} from '@heroicons/vue/24/outline';
 </script>
 
 <style lang="less" scoped>
-@import "../assets/less/variant.less";
+@import '../assets/less/variant.less';
 
 .toolbar-container {
   position: absolute;
+  z-index: 2;
   right: 24px;
   top: 24px;
   display: flex;
