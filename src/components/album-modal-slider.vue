@@ -13,7 +13,8 @@
           class="album-modal-slider-item flex items-center justify-center w-full h-full"
         >
           <img
-            class="album-modal-img object-contain max-h-full max-w-full"
+            id="image-id-1"
+            class="album-modal-img object-contain max-h-full max-w-full h-full w-full"
             :src="testImage2"
           />
         </div>
@@ -23,7 +24,7 @@
           class="album-modal-slider-item flex items-center justify-center w-full h-full"
         >
           <img
-            class="album-modal-img object-contain max-h-full max-w-full"
+            class="album-modal-img object-contain max-h-full max-w-full h-full w-full"
             :src="testImage2"
           />
         </div>
@@ -34,7 +35,7 @@
           class="album-modal-slider-item flex items-center justify-center w-full h-full"
         >
           <img
-            class="album-modal-img object-contain max-h-full max-w-full"
+            class="album-modal-img object-contain max-h-full max-w-full h-full w-full"
             :src="testImage1"
           />
         </div>

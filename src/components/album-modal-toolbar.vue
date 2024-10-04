@@ -1,6 +1,6 @@
 <template>
   <div class="toolbar-container">
-    <div class="button">
+    <div class="button" @click="onFullScreenClick">
       <ArrowsPointingOutIcon class="size-5" />
     </div>
     <Popover v-slot="{ open }">
@@ -61,6 +61,10 @@ import {
   HeartIcon,
   ViewfinderCircleIcon,
 } from '@heroicons/vue/24/outline';
+
+defineProps<{
+  onFullScreenClick: () => void;
+}>();
 </script>
 
 <style lang="less" scoped>

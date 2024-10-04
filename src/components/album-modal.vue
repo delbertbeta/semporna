@@ -2,12 +2,13 @@
   <modal @close="handleCloseModal" :visible="showAlbumModal" size="large">
     <div class="album-modal">
       <div class="image-container">
-        <album-modal-toolbar />
+        <album-modal-toolbar @full-screen-click="handleFullScreenClick" />
         <album-modal-slider />
       </div>
       <div class="info-container">
         <album-modal-info />
       </div>
+      <full-screen-viewer @close="handleCloseViewer" :image="fullscreenImage" />
     </div>
   </modal>
 </template>
@@ -19,6 +20,8 @@ import Modal from './modal.vue';
 import AlbumModalToolbar from './album-modal-toolbar.vue';
 import AlbumModalInfo from './album-modal-info.vue';
 import AlbumModalSlider from './album-modal-slider.vue';
+import fullScreenViewer from './full-screen-viewer.vue';
+import { ref } from 'vue';
 
 const store = useAppStore();
 const { closeAlbumModal } = store;
@@ -26,6 +29,16 @@ const { showAlbumModal } = storeToRefs(store);
 
 const handleCloseModal = () => {
   closeAlbumModal();
+};
+
+const fullscreenImage = ref();
+
+const handleCloseViewer = () => {
+  fullscreenImage.value = null;
+};
+
+const handleFullScreenClick = () => {
+  fullscreenImage.value = document.getElementById('image-id-1');
 };
 </script>
 
