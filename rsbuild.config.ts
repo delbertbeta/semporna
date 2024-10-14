@@ -1,18 +1,19 @@
-import path from "path";
+import path from 'path';
 
-import { defineConfig } from "@rsbuild/core";
-import { pluginVue } from "@rsbuild/plugin-vue";
-import { pluginLess } from "@rsbuild/plugin-less";
+import { defineConfig } from '@rsbuild/core';
+import { pluginVue } from '@rsbuild/plugin-vue';
+import { pluginLess } from '@rsbuild/plugin-less';
+import dotenv from 'dotenv';
 
-import config from "./dev.config";
+dotenv.config();
 
 export default defineConfig({
   html: {
-    title: "Semporna",
+    title: 'Semporna',
   },
   source: {
     entry: {
-      index: "./src/main.ts",
+      index: './src/main.ts',
     },
   },
   tools: {
@@ -22,13 +23,13 @@ export default defineConfig({
       chain.module
         .rule(CHAIN_ID.RULE.SVG)
         .test(/\.svg$/)
-        .use("svg-sprite-loader")
-        .loader("svg-sprite-loader")
+        .use('svg-sprite-loader')
+        .loader('svg-sprite-loader')
         .options(() => ({
           symbolId: (filePath) =>
             `svgicon-${path.basename(path.dirname(filePath))}-${path.basename(
               filePath,
-              ".svg"
+              '.svg'
             )}`,
         }));
     },
@@ -36,10 +37,10 @@ export default defineConfig({
   plugins: [pluginVue(), pluginLess()],
   dev: {
     client: {
-      port: String(config.hmr),
+      port: process.env.HMR_PORT,
     },
   },
   server: {
-    port: config.port,
+    port: process.env.LISTEN_PORT ? Number(process.env.LISTEN_PORT) : 3001,
   },
 });

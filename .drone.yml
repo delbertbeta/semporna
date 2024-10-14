@@ -15,7 +15,6 @@ steps:
       API_END_POINT:
         from_secret: api_end_point
     commands:
-      - 'echo "export default { apiEndPoint: ''$${API_END_POINT}'' }" > dev.config.ts'
       - yarn build
 
   - name: upload
