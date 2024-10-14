@@ -21,6 +21,8 @@
     "@heroicons/vue": "^2.1.5",
     "@yeger/vue-masonry-wall": "^5.0.10",
     "amap-js": "^2.4.0",
+    "axios": "^1.7.7",
+    "dayjs": "^1.11.13",
     "pinia": "^2.1.7",
     "swiper": "^11.1.4",
     "vue": "^3.5",

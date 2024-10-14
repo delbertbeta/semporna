@@ -15,6 +15,9 @@ export default defineConfig({
     entry: {
       index: './src/main.ts',
     },
+    define: {
+      API_END_POINT: JSON.stringify(process.env.API_END_POINT),
+    },
   },
   tools: {
     bundlerChain: (chain, { CHAIN_ID }) => {

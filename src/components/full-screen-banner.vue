@@ -12,30 +12,14 @@
       :simulate-touch="false"
       :loop-additional-slides="3"
     >
-      <swiper-slide>
+      <swiper-slide v-for="album in targetAlbums" :key="album.id">
         <div class="full-screen-banner-slider-item">
           <div class="info-tag">
-            <div class="into-year">2024/08</div>
-            <!-- <div class="into-bar"><span class="into-pos">广州</span><span class="info-des">test</span></div> -->
+            <div class="into-year">
+              {{ dayjs(album.date).format('YYYY/MM') }}
+            </div>
           </div>
-          <img class="full-screen-banner-img" :src="testImage2" />
-        </div>
-      </swiper-slide>
-      <swiper-slide>
-        <div class="full-screen-banner-slider-item">
-          <div class="info-tag">
-            <div class="into-year">2024/08</div>
-          </div>
-          <img class="full-screen-banner-img" :src="testImage2" />
-        </div>
-      </swiper-slide>
-
-      <swiper-slide>
-        <div class="full-screen-banner-slider-item">
-          <div class="info-tag">
-            <div class="into-year">2024/08</div>
-          </div>
-          <img class="full-screen-banner-img" :src="testImage1" />
+          <img class="full-screen-banner-img" :src="album.poster.objectPath" />
         </div>
       </swiper-slide>
 
@@ -62,16 +46,20 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Swiper as SwiperInner } from 'swiper';
 import { throttle } from 'lodash';
 import { Autoplay } from 'swiper/modules';
+import { storeToRefs } from 'pinia';
+import dayjs from 'dayjs';
 import 'swiper/css';
 
-import { testImage1 } from '@/mockData/testData';
-import { testImage2 } from '@/mockData/testData';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useAlbumStore } from '@/store/album';
 
+const store = useAlbumStore();
+const { albums } = storeToRefs(store);
 const modules = [Autoplay];
-
 const swiperRef = ref<SwiperInner>();
 const progressBar = ref<HTMLDivElement>();
+
+const targetAlbums = computed(() => albums.value.slice(0, 3));
 
 const handleSwiper = (swiper: SwiperInner) => {
   swiperRef.value = swiper;
