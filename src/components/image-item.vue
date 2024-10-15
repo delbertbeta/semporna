@@ -1,8 +1,13 @@
 <template>
-  <div @click="handleItemClick" class="image-box fade-in" @mouseenter="handleMouseEnter" @mouseleave="handleMouseLeave">
-    <img class="image" :src="item.url" />
+  <div
+    @click="handleItemClick"
+    class="image-box fade-in"
+    @mouseenter="handleMouseEnter"
+    @mouseleave="handleMouseLeave"
+  >
+    <img class="image" :src="matchImageUrl(item.poster, 'higher', '720p')" />
     <Transition>
-      <image-item-hover-meta v-if="hover" />
+      <image-item-hover-meta v-if="hover" :item="item" />
     </Transition>
   </div>
 </template>
@@ -11,8 +16,10 @@
 import { ref } from 'vue';
 import ImageItemHoverMeta from './image-item-hover-meta.vue';
 import { useAppStore } from '@/store';
+import { AlbumMeta } from '@/typings';
+import { matchImageUrl } from '@/utils';
 
-defineProps<{ item: { url: string } }>();
+defineProps<{ item: AlbumMeta }>();
 
 const store = useAppStore();
 const { openAlbumModal } = store;
@@ -21,16 +28,15 @@ const hover = ref(false);
 
 const handleMouseEnter = () => {
   hover.value = true;
-}
+};
 
 const handleMouseLeave = () => {
   hover.value = false;
-}
+};
 
 const handleItemClick = () => {
   openAlbumModal();
-}
-
+};
 </script>
 
 <style lang="less">

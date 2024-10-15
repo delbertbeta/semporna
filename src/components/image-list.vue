@@ -1,6 +1,12 @@
 <template>
-  <masonry-wall class="image-list-container" :items="images.concat(images).concat(images)" :column-width="300"
-    :min-columns="1" :max-columns="5" :gap="32">
+  <masonry-wall
+    class="image-list-container"
+    :items="albums"
+    :column-width="300"
+    :min-columns="1"
+    :max-columns="5"
+    :gap="32"
+  >
     <template #default="{ item, index }">
       <image-item :item="item" :key="index" />
     </template>
@@ -8,10 +14,13 @@
 </template>
 
 <script setup lang="ts">
-import { images } from '../mockData/testData';
 import ImageItem from './image-item.vue';
-import { reactive } from "vue";
 
+import { useAlbumStore } from '@/store/album';
+import { storeToRefs } from 'pinia';
+
+const store = useAlbumStore();
+const { albums } = storeToRefs(store);
 </script>
 
 <style lang="less">

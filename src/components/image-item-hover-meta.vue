@@ -2,12 +2,12 @@
   <div class="image-item-hover-meta">
     <div class="meta-bg-container">
       <div class="text-container">
-        <div class="stamp-month">11</div>
-        <div class="stamp-year">2021</div>
+        <div class="stamp-month">{{ dayJsObj.format('MM') }}</div>
+        <div class="stamp-year">{{ dayJsObj.format('YYYY') }}</div>
         <div class="top-divider" />
         <div class="stamp-from">From:</div>
-        <div class="stamp-from-city">深圳</div>
-        <div class="stamp-from-pos">深圳湾公园</div>
+        <div class="stamp-from-city">{{ item.mainArea }}</div>
+        <div class="stamp-from-pos">{{ item.subArea }}</div>
         <div class="bottom-divider" />
       </div>
       <svg-icon name="stamp-bg" class="stamp-bg" />
@@ -16,10 +16,18 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { AlbumMeta } from '@/typings';
+import dayjs from 'dayjs';
+import { computed } from 'vue';
+
+const props = defineProps<{ item: AlbumMeta }>();
+
+const dayJsObj = computed(() => dayjs(props.item.date));
+</script>
 
 <style lang="less">
-@import "../assets/less/variant.less";
+@import '../assets/less/variant.less';
 
 .image-item-hover-meta {
   position: absolute;
