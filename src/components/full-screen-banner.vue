@@ -47,14 +47,17 @@ import { Swiper as SwiperInner } from 'swiper';
 import { throttle } from 'lodash';
 import { Autoplay } from 'swiper/modules';
 import { storeToRefs } from 'pinia';
+import { useAppStore } from '@/store';
 import dayjs from 'dayjs';
 import 'swiper/css';
 
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useAlbumStore } from '@/store/album';
 
-const store = useAlbumStore();
-const { albums } = storeToRefs(store);
+const albumStore = useAlbumStore();
+const appStore = useAppStore();
+const { isAnyModalOpen } = storeToRefs(appStore);
+const { albums } = storeToRefs(albumStore);
 const modules = [Autoplay];
 const swiperRef = ref<SwiperInner>();
 const progressBar = ref<HTMLDivElement>();
@@ -83,6 +86,14 @@ const slideNext = () => {
 const slidePrev = () => {
   swiperRef.value?.slidePrev();
 };
+
+watch(isAnyModalOpen, (newValue) => {
+  if (newValue) {
+    swiperRef.value?.autoplay.stop();
+  } else {
+    swiperRef.value?.autoplay.start();
+  }
+});
 </script>
 
 <style lang="less" scoped>

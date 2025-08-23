@@ -19,6 +19,7 @@
     "@babel/runtime": "^7.24.7",
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.1.5",
+    "@vueuse/core": "^13.7.0",
     "@yeger/vue-masonry-wall": "^5.0.10",
     "amap-js": "^2.4.0",
     "axios": "^1.7.7",

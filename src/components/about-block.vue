@@ -1,5 +1,5 @@
 <template>
-  <div class="about-block">
+  <div class="about-block" :class="{ 'no-blur': isAnyModalOpen }">
     <div class="logo-box">
       <img class="logo" src="../assets/img/logo.png" />
       <div class="desc">
@@ -10,7 +10,12 @@
     <div class="line"></div>
     <div class="about-text pointer" @click="openAboutModal">
       关于这里
-      <svg-icon name="link" :width="16" :height="16" style="margin-left: 8px"></svg-icon>
+      <svg-icon
+        name="link"
+        :width="16"
+        :height="16"
+        style="margin-left: 8px"
+      ></svg-icon>
     </div>
 
     <div class="timeline">
@@ -23,12 +28,13 @@
 
 <script setup lang="ts">
 import { useAppStore } from '@/store';
+import { storeToRefs } from 'pinia';
 
 const store = useAppStore();
 
 const { openAboutModal } = store;
+const { isAnyModalOpen } = storeToRefs(store);
 </script>
-
 
 <style lang="less" scoped>
 .about-block {
@@ -40,9 +46,13 @@ const { openAboutModal } = store;
   top: 0;
   left: 0;
   bottom: 0;
-  background: linear-gradient(90deg, #EDECEA 0%, rgba(237, 236, 234, 0.6) 100%);
+  background: linear-gradient(90deg, #edecea 0%, rgba(237, 236, 234, 0.6) 100%);
   backdrop-filter: blur(32px);
   z-index: 1;
+
+  &.no-blur {
+    backdrop-filter: none;
+  }
 
   .logo-box {
     display: flex;
@@ -70,7 +80,7 @@ const { openAboutModal } = store;
 
   .line {
     width: 220px;
-    border: 1.5px solid #757C8A;
+    border: 1.5px solid #757c8a;
     margin: 24px 0;
   }
 
@@ -91,7 +101,7 @@ const { openAboutModal } = store;
     font-size: 16px;
     margin-top: 8px;
     cursor: pointer;
-    color: #D3D3D5;
+    color: #d3d3d5;
 
     font-weight: bold;
 

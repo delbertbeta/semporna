@@ -19,7 +19,7 @@ import { useAppStore } from '@/store';
 import { AlbumMeta } from '@/typings';
 import { matchImageUrl } from '@/utils';
 
-defineProps<{ item: AlbumMeta }>();
+const props = defineProps<{ item: AlbumMeta }>();
 
 const store = useAppStore();
 const { openAlbumModal } = store;
@@ -35,7 +35,7 @@ const handleMouseLeave = () => {
 };
 
 const handleItemClick = () => {
-  openAlbumModal();
+  openAlbumModal(props.item);
 };
 </script>
 

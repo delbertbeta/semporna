@@ -1,6 +1,6 @@
 <template>
   <div class="toolbar-container">
-    <div class="button" @click="onFullScreenClick">
+    <div class="button" @click="emit('fullScreenClick')">
       <ArrowsPointingOutIcon class="size-5" />
     </div>
     <Popover v-slot="{ open }">
@@ -19,37 +19,51 @@
         leave-to-class="translate-y-1 opacity-0"
       >
         <PopoverPanel
-          class="absolute left-1/2 z-10 mt-3 -translate-x-3/4 p-4 w-80 rounded-lg bg-white-transparent-1"
+          class="absolute left-1/2 z-10 mt-3 -translate-x-[85%] p-3 w-80 rounded-lg bg-white-transparent-2 backdrop-blur-sm"
         >
-          <div class="rounded-lg bg-white w-full overflow-hidden">
+          <div class="rounded-md bg-white w-full overflow-hidden">
             <div
               class="text-text-main bg-green-transparent-1 h-7 px-3 font-bold w-full leading-7"
             >
-              2021/11/21 13:53
+              {{
+                photo?.image.exif.dateTime
+                  ? new Date(photo.image.exif.dateTime).toLocaleString()
+                  : '未知拍摄时间'
+              }}
             </div>
             <div class="flex flex-row items-start py-2 px-3">
               <ViewfinderCircleIcon class="size-4 mt-0.5" />
               <div class="flex flex-col font-medium ms-2 text-sm">
-                <div>Nikon D3200</div>
-                <div>SIGMA 18-125mm F3.8-5.6-DC OS HSM</div>
+                <div>{{ photo?.image.exif.model || '未知相机' }}</div>
+                <div>{{ photo?.image.exif.lens || '未知镜头' }}</div>
               </div>
             </div>
             <div class="bg-divider h-px mx-3" />
             <div class="flex font-medium mt-1 mb-2 mx-3 text-sm">
-              <div class="photo-params-item after:bg-divider">ƒ 1.8</div>
-              <div class="photo-params-item after:bg-divider">26mm</div>
-              <div class="photo-params-item after:bg-divider">ISO 3600</div>
-              <div class="photo-params-item after:bg-divider">+1 ev</div>
-              <div class="photo-params-item after:bg-divider">1/12000s</div>
+              <div class="photo-params-item after:bg-divider">
+                {{ photo?.image.exif.fNumber || 'ƒ -' }}
+              </div>
+              <div class="photo-params-item after:bg-divider">
+                {{ photo?.image.exif.focalLength || '- mm' }}
+              </div>
+              <div class="photo-params-item after:bg-divider">
+                {{ photo?.image.exif.iso || 'ISO -' }}
+              </div>
+              <div class="photo-params-item after:bg-divider">
+                {{ photo?.image.exif.ev || '- ev' }}
+              </div>
+              <div class="photo-params-item after:bg-divider">
+                {{ photo?.image.exif.exposureTime || '- s' }}
+              </div>
             </div>
           </div>
         </PopoverPanel>
       </transition>
     </Popover>
-    <div class="button">
+    <!-- <div class="button">
       <HeartIcon class="size-5" />
       23
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -61,9 +75,14 @@ import {
   HeartIcon,
   ViewfinderCircleIcon,
 } from '@heroicons/vue/24/outline';
+import { AlbumRes } from '@/typings';
 
 defineProps<{
-  onFullScreenClick: () => void;
+  photo?: AlbumRes['photos'][0] | null;
+}>();
+
+const emit = defineEmits<{
+  (e: 'fullScreenClick'): void;
 }>();
 </script>
 

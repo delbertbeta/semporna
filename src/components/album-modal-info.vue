@@ -3,24 +3,31 @@
     <div class="info-header">
       <div class="stamp-info-wrapper">
         <div class="stamp-info-from">From:</div>
-        <div class="stamp-info-city">深圳</div>
-        <div class="stamp-info-pos">深圳湾公园</div>
+        <div class="stamp-info-city">{{ album?.mainArea }}</div>
+        <div class="stamp-info-pos">{{ album?.subArea }}</div>
       </div>
       <svg-icon name="stamp-full.min" class="stamp-full" :width="135" />
     </div>
     <div class="info-text">
-      <div class="info-text-title">关于这里</div>
+      <div class="info-text-title">{{ photo?.title }}</div>
       <div class="info-text-description">
-        啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦啦
+        {{ photo?.description }}
       </div>
     </div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { AlbumRes } from '@/typings';
+
+defineProps<{
+  photo: AlbumRes['photos'][0] | null;
+  album: AlbumRes | null;
+}>();
+</script>
 
 <style lang="less" scoped>
-@import "../assets/less/variant.less";
+@import '../assets/less/variant.less';
 
 .inner-info-container {
   height: 100%;

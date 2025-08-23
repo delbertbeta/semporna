@@ -1,9 +1,4 @@
-export interface AlbumModel {
-  id?: string;
-  date: string;
-  mainArea: string;
-  subArea: string;
-}
+// 图片相关类型
 export interface ImageModel {
   id: string;
   objectPath: string;
@@ -28,11 +23,21 @@ export interface ImageModel {
   };
 }
 
+// 照片相关类型
 export interface PhotoModel {
   id?: string;
   isPost: boolean;
   title: string;
   description: string;
+  image?: ImageModel;
+}
+
+// 相册相关类型
+export interface AlbumModel {
+  id?: string;
+  date: string;
+  mainArea: string;
+  subArea: string;
 }
 
 export type AlbumRes = AlbumModel & {
