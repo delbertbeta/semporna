@@ -18,17 +18,14 @@
       ></svg-icon>
     </div>
 
-    <div class="timeline">
-      <div class="timeline-item active">2024</div>
-      <div class="timeline-item">2023</div>
-      <div class="timeline-item">2022</div>
-    </div>
+    <timeline-block />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useAppStore } from '@/store';
 import { storeToRefs } from 'pinia';
+import TimelineBlock from './timeline-block.vue';
 
 const store = useAppStore();
 
@@ -48,6 +45,7 @@ const { isAnyModalOpen } = storeToRefs(store);
   bottom: 0;
   background: linear-gradient(90deg, #edecea 0%, rgba(237, 236, 234, 0.6) 100%);
   backdrop-filter: blur(32px);
+  transition: backdrop-filter 0.3s ease;
   z-index: 1;
 
   &.no-blur {
@@ -89,25 +87,6 @@ const { isAnyModalOpen } = storeToRefs(store);
     align-items: center;
     font-size: 16px;
     font-weight: normal;
-  }
-
-  .timeline {
-    position: absolute;
-    left: 42px;
-    bottom: 42px;
-  }
-
-  .timeline-item {
-    font-size: 16px;
-    margin-top: 8px;
-    cursor: pointer;
-    color: #d3d3d5;
-
-    font-weight: bold;
-
-    &.active {
-      color: #121315;
-    }
   }
 }
 </style>
