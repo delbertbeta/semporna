@@ -19,7 +19,7 @@
             :key="month"
             class="timeline-month-item"
             :class="{ active: activeMonth === month }"
-            @click="toggleMonth(month)"
+            @click="toggleMonth(item.year, month)"
           >
             {{ month }} 月
           </div>
@@ -30,34 +30,76 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { useAlbumStore } from '@/store/album';
+import { computed, watch } from 'vue';
+import { storeToRefs } from 'pinia';
 
-const timelineData = ref([
-  { year: 2024, months: [3, 5] },
-  { year: 2023, months: [6] },
-  { year: 2022, months: [1, 8, 12] },
-]);
+const albumStore = useAlbumStore();
+const { albums, activeYear, activeMonth } = storeToRefs(albumStore);
+const { setActiveDate } = albumStore;
 
-const activeYear = ref<null | number>(timelineData.value[0].year);
-const activeMonth = ref<null | number>(timelineData.value[0].months[0]);
+const timelineData = computed(() => {
+  const yearMap: Record<number, Set<number>> = {};
+  albums.value.forEach((album) => {
+    const date = new Date(album.date);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    if (!yearMap[year]) {
+      yearMap[year] = new Set();
+    }
+    yearMap[year].add(month);
+  });
 
-const toggleYear = (year: number) => {
-  if (activeYear.value === year) {
-    activeYear.value = null;
-    activeMonth.value = null;
-  } else {
-    activeYear.value = year;
-    const yearData = timelineData.value.find((item) => item.year === year);
-    if (yearData && yearData.months.length > 0) {
-      activeMonth.value = yearData.months[0];
-    } else {
-      activeMonth.value = null;
+  return Object.keys(yearMap)
+    .map((yearStr) => {
+      const year = parseInt(yearStr, 10);
+      const months = Array.from(yearMap[year]).sort((a, b) => a - b);
+      return { year, months };
+    })
+    .sort((a, b) => b.year - a.year);
+});
+
+watch(
+  timelineData,
+  (newTimelineData) => {
+    if (newTimelineData.length > 0 && activeYear.value === null) {
+      const latestYear = newTimelineData[0].year;
+      const latestMonth = newTimelineData[0].months[0];
+      setActiveDate(latestYear, latestMonth);
+    }
+  },
+  { immediate: true }
+);
+
+const scrollToImage = (year: number, month: number) => {
+  const scrollWrapper = document.querySelector('.scroll-wrapper');
+  if (scrollWrapper) {
+    const targetImage = document.querySelector(
+      `.image-box[data-year='${year}'][data-month='${month}']`
+    );
+    if (targetImage) {
+      scrollWrapper.scrollTo({
+        top: (targetImage as HTMLElement).offsetTop - 80,
+        behavior: 'smooth',
+      });
     }
   }
 };
 
-const toggleMonth = (month: number) => {
-  activeMonth.value = month;
+const toggleYear = (year: number) => {
+  if (activeYear.value !== year) {
+    const yearData = timelineData.value.find((item) => item.year === year);
+    if (yearData && yearData.months.length > 0) {
+      const month = yearData.months[0];
+      setActiveDate(year, month);
+      scrollToImage(year, month);
+    }
+  }
+};
+
+const toggleMonth = (year: number, month: number) => {
+  setActiveDate(year, month);
+  scrollToImage(year, month);
 };
 </script>
 
@@ -74,6 +116,7 @@ const toggleMonth = (month: number) => {
   cursor: pointer;
   color: #a9a9a9;
   font-weight: bold;
+  transition: color 0.3s ease-in-out;
 
   &.active {
     color: #121315;
@@ -91,6 +134,7 @@ const toggleMonth = (month: number) => {
   color: #a9a9a9;
   cursor: pointer;
   font-weight: bold;
+  transition: color 0.3s ease-in-out;
 
   &.active {
     color: #121315;

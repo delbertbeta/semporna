@@ -8,6 +8,9 @@ export const useAlbumStore = defineStore('album', () => {
   const initialized = ref<boolean>(false);
   const error = ref<boolean>(false);
 
+  const activeYear = ref<number | null>(null);
+  const activeMonth = ref<number | null>(null);
+
   const initAlbums = async () => {
     try {
       const albumsRes = await getAlbumMeta();
@@ -22,11 +25,19 @@ export const useAlbumStore = defineStore('album', () => {
     }
   };
 
+  const setActiveDate = (year: number, month: number) => {
+    activeYear.value = year;
+    activeMonth.value = month;
+  };
+
   return {
     albums,
     initialized,
     error,
+    activeYear,
+    activeMonth,
 
     initAlbums,
+    setActiveDate,
   };
 });

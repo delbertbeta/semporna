@@ -4,6 +4,8 @@
     class="image-box fade-in"
     @mouseenter="handleMouseEnter"
     @mouseleave="handleMouseLeave"
+    :data-year="new Date(item.date).getFullYear()"
+    :data-month="new Date(item.date).getMonth() + 1"
   >
     <img class="image" :src="matchImageUrl(item.poster, 'higher', '720p')" />
     <Transition>
