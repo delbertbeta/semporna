@@ -1,21 +1,23 @@
 <template>
   <div class="about-block" :class="{ 'no-blur': isAnyModalOpen }">
-    <div class="logo-box">
-      <img class="logo" src="../assets/img/logo.png" />
-      <div class="desc">
-        <div class="top-text">All about</div>
-        <div class="bottom-text">Delbert &amp; Shyrii</div>
+    <div>
+      <div class="logo-box">
+        <img class="logo" src="../assets/img/logo.png" />
+        <div class="desc">
+          <div class="top-text">All about</div>
+          <div class="bottom-text">Delbert &amp; Shyrii</div>
+        </div>
       </div>
-    </div>
-    <div class="line"></div>
-    <div class="about-text pointer" @click="openAboutModal">
-      关于这里
-      <svg-icon
-        name="link"
-        :width="16"
-        :height="16"
-        style="margin-left: 8px"
-      ></svg-icon>
+      <div class="line"></div>
+      <div class="about-text pointer" @click="openAboutModal">
+        关于这里
+        <svg-icon
+          name="link"
+          :width="16"
+          :height="16"
+          style="margin-left: 8px"
+        ></svg-icon>
+      </div>
     </div>
 
     <timeline-block />
@@ -47,6 +49,10 @@ const { isAnyModalOpen } = storeToRefs(store);
   backdrop-filter: blur(32px);
   transition: backdrop-filter 0.3s ease;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
 
   &.no-blur {
     backdrop-filter: none;

@@ -13,6 +13,7 @@
           v-if="activeYear === item.year"
           class="timeline-months"
           :style="{ '--month-count': item.months.length }"
+          :ref="(el) => { if (activeYear === item.year) timelineMonthsRef = el as HTMLElement }"
         >
           <div
             v-for="month in item.months"
@@ -31,7 +32,7 @@
 
 <script setup lang="ts">
 import { useAlbumStore } from '@/store/album';
-import { computed, watch } from 'vue';
+import { computed, watch, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 
 const albumStore = useAlbumStore();
@@ -71,6 +72,51 @@ watch(
   { immediate: true }
 );
 
+const timelineMonthsRef = ref<HTMLElement | null>(null);
+
+watch([activeMonth, activeYear], async (newVal, oldVal) => {
+  await nextTick();
+  const [newMonth, newYear] = newVal;
+  const [oldMonth, oldYear] = oldVal;
+
+  const scrollActiveMonthIntoView = () => {
+    const activeMonthEl = document.querySelector(
+      '.timeline-month-item.active'
+    ) as HTMLElement;
+    if (activeMonthEl) {
+      activeMonthEl.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+      });
+    }
+  };
+
+  if (newYear !== oldYear) {
+    // activeYear 变化，需要等待过渡结束
+    if (timelineMonthsRef.value) {
+      const handleTransitionEnd = (event: TransitionEvent) => {
+        if (event.propertyName === 'max-height') {
+          scrollActiveMonthIntoView();
+          timelineMonthsRef.value?.removeEventListener(
+            'transitionend',
+            handleTransitionEnd
+          );
+        }
+      };
+      timelineMonthsRef.value.addEventListener(
+        'transitionend',
+        handleTransitionEnd
+      );
+    } else {
+      // 如果没有 ref，可能是元素还没渲染，直接滚动（作为 fallback）
+      scrollActiveMonthIntoView();
+    }
+  } else if (newMonth !== oldMonth) {
+    // activeMonth 变化但 activeYear 没变，直接滚动
+    scrollActiveMonthIntoView();
+  }
+});
+
 const scrollToImage = (year: number, month: number) => {
   const scrollWrapper = document.querySelector('.scroll-wrapper');
   if (scrollWrapper) {
@@ -105,9 +151,25 @@ const toggleMonth = (year: number, month: number) => {
 
 <style lang="less" scoped>
 .timeline {
-  position: absolute;
-  left: 42px;
-  bottom: 42px;
+  min-height: 0;
+  overflow-y: auto;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.2);
+  }
+}
+
+.timeline-year {
+  overflow: hidden;
 }
 
 .timeline-item {
