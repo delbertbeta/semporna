@@ -8,12 +8,14 @@
     <div class="album-modal">
       <div class="image-container">
         <album-modal-toolbar
+          v-show="!isImageLoading"
           :photo="currentPhoto"
           @full-screen-click="handleFullScreenClick"
         />
         <album-modal-slider
           :album="albumDetail"
           @slideChange="handleSlideChange"
+          @image-loading-state="handleImageLoadingState"
         />
       </div>
       <div class="info-container">
@@ -44,6 +46,11 @@ const albumCache = new Map();
 const loading = ref(false);
 const albumDetail = ref<AlbumRes | null>(null);
 const currentPhoto = ref<AlbumRes['photos'][0] | null>(null);
+const isImageLoading = ref(true);
+
+const handleImageLoadingState = (loading: boolean) => {
+  isImageLoading.value = loading;
+};
 
 const handleSlideChange = (photo: AlbumRes['photos'][0]) => {
   currentPhoto.value = photo;

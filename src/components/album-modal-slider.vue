@@ -12,7 +12,13 @@
         <div
           class="album-modal-slider-item flex items-center justify-center w-full h-full"
         >
+          <loading-placeholder
+            :loading="!imageLoadedState[photo.id!]"
+            theme="black"
+          />
           <img
+            v-show="imageLoadedState[photo.id!]"
+            @load="imageLoadedState[photo.id!] = true"
             :id="`image-id-${photo.id}`"
             class="album-modal-img object-contain max-h-full max-w-full h-full w-full"
             :src="matchImageUrl(photo.image, 'higher', '1080p')"
@@ -41,13 +47,15 @@
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Swiper as SwiperInner } from 'swiper';
 import 'swiper/css';
+import LoadingPlaceholder from './loading-placeholder.vue';
 
-import { ref } from 'vue';
+import { ref, watchEffect, computed, watch } from 'vue';
 import { AlbumRes } from '@/typings';
 import { matchImageUrl } from '@/utils';
 
 const emit = defineEmits<{
   (e: 'slideChange', photo: AlbumRes['photos'][0]): void;
+  (e: 'image-loading-state', loading: boolean): void;
 }>();
 
 const props = defineProps<{
@@ -55,11 +63,45 @@ const props = defineProps<{
 }>();
 
 const swiperRef = ref<SwiperInner>();
+const currentSlideIndex = ref(0);
+
+const imageLoadedState = ref<Record<number, boolean>>({});
+
+const isCurrentImageLoading = computed(() => {
+  const photos = props.album?.photos || [];
+  const currentPhoto = photos[currentSlideIndex.value];
+  const loadedState = imageLoadedState.value[currentPhoto?.id || ''];
+
+  if (!currentPhoto) {
+    return false;
+  }
+  return !loadedState;
+});
+
+watch(
+  isCurrentImageLoading,
+  (loading) => {
+    emit('image-loading-state', loading);
+  },
+  {
+    immediate: true,
+  }
+);
+
+watchEffect(() => {
+  if (!props.album?.photos) return;
+  for (const photo of props.album.photos) {
+    if (imageLoadedState.value[photo.id!] === undefined) {
+      imageLoadedState.value[photo.id!] = false;
+    }
+  }
+});
 
 const handleSwiper = (swiper: SwiperInner) => {
   swiperRef.value = swiper;
   swiper.on('slideChange', () => {
     const currentIndex = swiper.realIndex;
+    currentSlideIndex.value = Number.isNaN(currentIndex) ? 0 : currentIndex;
     const photos = props.album?.photos || [];
     if (photos[currentIndex]) {
       emit('slideChange', photos[currentIndex]);

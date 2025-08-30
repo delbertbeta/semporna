@@ -19,7 +19,11 @@
               {{ dayjs(album.date).format('YYYY/MM') }}
             </div>
           </div>
-          <img class="full-screen-banner-img" :src="album.poster.objectPath" />
+          <img
+            class="full-screen-banner-img"
+            :src="album.poster.objectPath"
+            @click="handleBannerClick(album)"
+          />
         </div>
       </swiper-slide>
 
@@ -52,6 +56,7 @@ import dayjs from 'dayjs';
 import 'swiper/css';
 
 import { computed, ref, watch } from 'vue';
+import { AlbumMeta } from '@/typings';
 import { useAlbumStore } from '@/store/album';
 
 const albumStore = useAlbumStore();
@@ -85,6 +90,10 @@ const slideNext = () => {
 
 const slidePrev = () => {
   swiperRef.value?.slidePrev();
+};
+
+const handleBannerClick = (album: AlbumMeta) => {
+  appStore.openAlbumModal(album);
 };
 
 watch(isAnyModalOpen, (newValue) => {
@@ -122,6 +131,7 @@ watch(isAnyModalOpen, (newValue) => {
   width: calc(100% - 64px);
 
   & > .full-screen-banner-img {
+    cursor: pointer;
     height: 100%;
     width: 100%;
     object-fit: cover;

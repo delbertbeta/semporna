@@ -11,11 +11,7 @@
       <div class="modal-wrapper" :class="{ [`size-${size}`]: true }">
         <div class="card-block">
           <div class="front-box">
-            <transition name="fade-in-out">
-              <div class="loader-container" v-if="realLoading">
-                <div class="loader" />
-              </div>
-            </transition>
+            <loading-placeholder :loading="realLoading" />
             <slot></slot>
           </div>
           <transition name="rotate" type="animation">
@@ -28,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+import LoadingPlaceholder from './loading-placeholder.vue';
 import { computed, ref } from 'vue';
 
 const props = defineProps<{
@@ -152,21 +149,6 @@ const handleAfterLeave = () => {
   }
 }
 
-.fade-in-out-enter-to,
-.fade-in-out-leave-from {
-  opacity: 1;
-}
-
-.fade-in-out-enter-active,
-.fade-in-out-leave-active {
-  transition: opacity 0.3s ease-in-out;
-}
-
-.fade-in-out-enter-from,
-.fade-in-out-leave-to {
-  opacity: 0;
-}
-
 .rotate-enter-active {
   animation: rotate 0.3s ease-in-out both;
 }
@@ -196,78 +178,6 @@ const handleAfterLeave = () => {
   100% {
     opacity: 0;
     transform: translateY(20%);
-  }
-}
-
-.loader-container {
-  width: 100%;
-  height: 100%;
-  z-index: 99;
-  position: absolute;
-  top: 0;
-  left: 0;
-  background-color: #fff;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-/* HTML: <div class="loader"></div> */
-.loader {
-  width: 65px;
-  aspect-ratio: 1;
-  position: relative;
-}
-
-.loader:before,
-.loader:after {
-  content: '';
-  position: absolute;
-  border-radius: 50px;
-  box-shadow: 0 0 0 3px inset #000;
-  animation: l4 2.5s infinite;
-}
-
-.loader:after {
-  animation-delay: -1.25s;
-}
-
-@keyframes l4 {
-  0% {
-    inset: 0 35px 35px 0;
-  }
-
-  12.5% {
-    inset: 0 35px 0 0;
-  }
-
-  25% {
-    inset: 35px 35px 0 0;
-  }
-
-  37.5% {
-    inset: 35px 0 0 0;
-  }
-
-  50% {
-    inset: 35px 0 0 35px;
-  }
-
-  62.5% {
-    inset: 0 0 0 35px;
-  }
-
-  75% {
-    inset: 0 0 35px 35px;
-  }
-
-  87.5% {
-    inset: 0 0 35px 0;
-  }
-
-  100% {
-    inset: 0 35px 35px 0;
   }
 }
 
