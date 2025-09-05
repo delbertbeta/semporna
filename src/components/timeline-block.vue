@@ -153,19 +153,6 @@ const toggleMonth = (year: number, month: number) => {
 .timeline {
   min-height: 0;
   overflow-y: auto;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: 2px;
-    background: rgba(0, 0, 0, 0.2);
-  }
 }
 
 .timeline-year {

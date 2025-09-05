@@ -8,12 +8,14 @@
       </div>
       <svg-icon name="stamp-full.min" class="stamp-full" :width="135" />
     </div>
-    <div class="info-text">
-      <div class="info-text-title">{{ photo?.title }}</div>
-      <div class="info-text-description">
-        {{ photo?.description }}
+    <transition name="fade" mode="out-in">
+      <div class="info-text" :key="photo?.image.id">
+        <div class="info-text-title">{{ photo?.title }}</div>
+        <div class="info-text-description">
+          {{ photo?.description }}
+        </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
@@ -32,7 +34,7 @@ defineProps<{
 .inner-info-container {
   height: 100%;
   width: 100%;
-  padding: 38px 50px;
+  padding: 38px 50px 42px;
   display: flex;
   flex-direction: column;
 
@@ -81,7 +83,18 @@ defineProps<{
 .info-text {
   margin-top: 32px;
   flex-grow: 1;
-  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .info-text-title {
