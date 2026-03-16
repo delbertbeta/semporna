@@ -8,16 +8,6 @@
           <div class="bottom-text">Delbert &amp; Shyrii</div>
         </div>
       </div>
-      <div class="line"></div>
-      <div class="about-text pointer" @click="openAboutModal">
-        关于这里
-        <svg-icon
-          name="link"
-          :width="16"
-          :height="16"
-          style="margin-left: 8px"
-        ></svg-icon>
-      </div>
     </div>
 
     <timeline-block />
@@ -31,7 +21,6 @@ import TimelineBlock from './timeline-block.vue';
 
 const store = useAppStore();
 
-const { openAboutModal } = store;
 const { isAnyModalOpen } = storeToRefs(store);
 </script>
 
@@ -82,17 +71,5 @@ const { isAnyModalOpen } = storeToRefs(store);
     }
   }
 
-  .line {
-    width: 220px;
-    border: 1.5px solid #757c8a;
-    margin: 24px 0;
-  }
-
-  .about-text {
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-    font-weight: normal;
-  }
 }
 </style>

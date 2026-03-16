@@ -2,7 +2,6 @@
   <div class="home-container">
     <about-block></about-block>
     <image-gallery></image-gallery>
-    <about-modal />
     <album-modal />
   </div>
 </template>
@@ -10,7 +9,6 @@
 <script setup lang="ts">
 import AboutBlock from '../components/about-block.vue';
 import ImageGallery from '../components/image-gallery.vue';
-import AboutModal from '../components/about-modal.vue';
 import AlbumModal from '../components/album-modal.vue';
 </script>
 

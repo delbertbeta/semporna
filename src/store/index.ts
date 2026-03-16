@@ -3,17 +3,8 @@ import { ref, computed } from 'vue';
 import { AlbumMeta } from '@/typings';
 
 export const useAppStore = defineStore('app', () => {
-  const showAboutModal = ref(false);
   const showAlbumModal = ref(false);
   const currentAlbumItem = ref<AlbumMeta | null>(null);
-
-  const openAboutModal = () => {
-    showAboutModal.value = true;
-  };
-
-  const closeAboutModal = () => {
-    showAboutModal.value = false;
-  };
 
   const openAlbumModal = (item: AlbumMeta) => {
     currentAlbumItem.value = item;
@@ -25,14 +16,9 @@ export const useAppStore = defineStore('app', () => {
     currentAlbumItem.value = null;
   };
 
-  const isAnyModalOpen = computed(
-    () => showAboutModal.value || showAlbumModal.value
-  );
+  const isAnyModalOpen = computed(() => showAlbumModal.value);
 
   return {
-    showAboutModal,
-    openAboutModal,
-    closeAboutModal,
     isAnyModalOpen,
 
     showAlbumModal,
