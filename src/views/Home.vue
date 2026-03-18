@@ -3,6 +3,7 @@
     <about-block></about-block>
     <image-gallery></image-gallery>
     <album-modal />
+    <mobile-drawer />
   </div>
 </template>
 
@@ -10,6 +11,7 @@
 import AboutBlock from '../components/about-block.vue';
 import ImageGallery from '../components/image-gallery.vue';
 import AlbumModal from '../components/album-modal.vue';
+import MobileDrawer from '../components/mobile-drawer.vue';
 </script>
 
 <style lang="less" scoped>
