@@ -34,10 +34,15 @@
 import { useAlbumStore } from '@/store/album';
 import { computed, watch, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
+import { useScrollOffset } from '@/composables/useScrollOffset';
+import { useAppStore } from '@/store';
 
 const albumStore = useAlbumStore();
 const { albums, activeYear, activeMonth } = storeToRefs(albumStore);
 const { setActiveDate } = albumStore;
+
+const appStore = useAppStore();
+const { isMobile, scrollOffset } = useScrollOffset();
 
 const timelineData = computed(() => {
   const yearMap: Record<number, Set<number>> = {};
@@ -118,14 +123,22 @@ watch([activeMonth, activeYear], async (newVal, oldVal) => {
 });
 
 const scrollToImage = (year: number, month: number) => {
-  const scrollWrapper = document.querySelector('.scroll-wrapper');
-  if (scrollWrapper) {
-    const targetImage = document.querySelector(
-      `.image-box[data-year='${year}'][data-month='${month}']`
-    );
-    if (targetImage) {
+  const target = document.querySelector(
+    `.image-box[data-year='${year}'][data-month='${month}']`
+  ) as HTMLElement;
+
+  if (!target) return;
+
+  if (isMobile.value) {
+    window.scrollTo({
+      top: target.getBoundingClientRect().top + window.scrollY - scrollOffset.value,
+      behavior: 'smooth',
+    });
+  } else {
+    const scrollWrapper = document.querySelector('.scroll-wrapper');
+    if (scrollWrapper) {
       scrollWrapper.scrollTo({
-        top: (targetImage as HTMLElement).offsetTop - 80,
+        top: (target as HTMLElement).offsetTop - 80,
         behavior: 'smooth',
       });
     }
@@ -146,6 +159,9 @@ const toggleYear = (year: number) => {
 const toggleMonth = (year: number, month: number) => {
   setActiveDate(year, month);
   scrollToImage(year, month);
+  if (isMobile.value) {
+    appStore.closeMobileDrawer();
+  }
 };
 </script>
 
