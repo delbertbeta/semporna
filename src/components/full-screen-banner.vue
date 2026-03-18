@@ -1,5 +1,12 @@
 <template>
   <div class="full-screen-banner fade-in">
+    <button
+      v-if="isMobile"
+      class="hamburger-btn"
+      @click="toggleMobileDrawer"
+    >
+      <span>&#9776;</span>
+    </button>
     <swiper
       class="full-screen-banner-slider"
       :space-between="-36"
@@ -9,7 +16,7 @@
       @autoplayTimeLeft="onAutoplayTimeLeft"
       @swiper="handleSwiper"
       :speed="720"
-      :simulate-touch="false"
+      :simulate-touch="isMobile"
       :loop-additional-slides="3"
     >
       <swiper-slide v-for="album in targetAlbums" :key="album.id">
@@ -58,10 +65,13 @@ import 'swiper/css';
 import { computed, ref, watch } from 'vue';
 import { AlbumMeta } from '@/typings';
 import { useAlbumStore } from '@/store/album';
+import { useScrollOffset } from '@/composables/useScrollOffset';
 
 const albumStore = useAlbumStore();
 const appStore = useAppStore();
+const { toggleMobileDrawer } = appStore;
 const { isAnyModalOpen } = storeToRefs(appStore);
+const { isMobile } = useScrollOffset();
 const { albums } = storeToRefs(albumStore);
 const modules = [Autoplay];
 const swiperRef = ref<SwiperInner>();
@@ -260,5 +270,80 @@ watch(isAnyModalOpen, (newValue) => {
   width: 0%;
   background-color: rgba(0, 0, 0, 0.3);
   transition: width 0.1s ease;
+}
+
+.hamburger-btn {
+  display: none;
+
+  @media (max-width: 768px) {
+    display: flex;
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    z-index: 10;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    color: white;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .left-arrow,
+  .right-arrow {
+    display: none;
+  }
+
+  .scroll-down {
+    display: none;
+  }
+
+  .full-screen-banner {
+    height: 55vw;
+  }
+
+  .full-screen-banner-slider {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  .autoplay-progress {
+    top: unset;
+    bottom: 8px;
+    right: 50%;
+    transform: translateX(50%);
+  }
+
+  // 将日期标签移到 Banner 底部左侧
+  .swiper-slide-active .info-tag {
+    top: unset;
+    bottom: 14px;
+    left: 14px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .info-tag {
+    top: unset;
+    bottom: 14px;
+    left: 14px;
+  }
+
+  .into-year {
+    font-size: 18px;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
 }
 </style>
