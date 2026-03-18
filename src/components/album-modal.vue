@@ -288,6 +288,7 @@ watchEffect(() => {
     fetchAlbumDetail(currentAlbumItem.value.id);
     currentSlideIndexMobile.value = 0;
     isExpanded.value = false;
+    currentPhoto.value = null;
   }
 });
 
