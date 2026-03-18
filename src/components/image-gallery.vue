@@ -1,22 +1,24 @@
 <template>
   <div class="scroll-wrapper" @scroll="handleScroll">
     <full-screen-banner />
+    <mobile-month-tabs v-if="isMobile" />
     <image-list />
   </div>
 </template>
 
 <script lang="ts" setup>
+import { watch, onUnmounted } from 'vue';
 import ImageList from './image-list.vue';
 import FullScreenBanner from './full-screen-banner.vue';
 import { useAlbumStore } from '@/store/album';
 import { throttle } from 'lodash-es';
+import { useScrollOffset } from '@/composables/useScrollOffset';
+import MobileMonthTabs from './mobile-month-tabs.vue';
 
 const store = useAlbumStore();
+const { isMobile, scrollOffset } = useScrollOffset();
 
 const handleScroll = throttle(() => {
-  const scrollWrapper = document.querySelector('.scroll-wrapper');
-  if (!scrollWrapper) return;
-
   const imageItems = document.querySelectorAll(
     '.masonry-column:first-of-type .image-box'
   );
@@ -30,7 +32,7 @@ const handleScroll = throttle(() => {
     const mid = low + Math.floor((high - low) / 2);
     const rect = imageItems[mid].getBoundingClientRect();
 
-    if (rect.top > 120) {
+    if (rect.top > scrollOffset.value) {
       high = mid - 1;
     } else if (rect.top < 0) {
       low = mid + 1;
@@ -52,6 +54,23 @@ const handleScroll = throttle(() => {
     }
   }
 }, 200);
+
+// 响应式管理 window scroll 监听（支持窗口 resize 切换断点）
+watch(
+  isMobile,
+  (mobile) => {
+    if (mobile) {
+      window.addEventListener('scroll', handleScroll);
+    } else {
+      window.removeEventListener('scroll', handleScroll);
+    }
+  },
+  { immediate: true }
+);
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
 </script>
 
 <style lang="less">
@@ -74,6 +93,13 @@ const handleScroll = throttle(() => {
   100% {
     opacity: 1;
     visibility: visible;
+  }
+}
+
+@media (max-width: 768px) {
+  .scroll-wrapper {
+    height: auto;
+    overflow-y: unset;
   }
 }
 </style>
