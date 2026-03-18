@@ -1,26 +1,15 @@
 <template>
   <div class="about-block" :class="{ 'no-blur': isAnyModalOpen }">
-    <div>
-      <div class="logo-box">
-        <img class="logo" src="../assets/img/logo.png" />
-        <div class="desc">
-          <div class="top-text">All about</div>
-          <div class="bottom-text">Delbert &amp; Shyrii</div>
-        </div>
-      </div>
-    </div>
-
-    <timeline-block />
+    <sidebar-content />
   </div>
 </template>
 
 <script setup lang="ts">
 import { useAppStore } from '@/store';
 import { storeToRefs } from 'pinia';
-import TimelineBlock from './timeline-block.vue';
+import SidebarContent from './sidebar-content.vue';
 
 const store = useAppStore();
-
 const { isAnyModalOpen } = storeToRefs(store);
 </script>
 
@@ -38,38 +27,15 @@ const { isAnyModalOpen } = storeToRefs(store);
   backdrop-filter: blur(32px);
   transition: backdrop-filter 0.3s ease;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 8px;
 
   &.no-blur {
     backdrop-filter: none;
   }
+}
 
-  .logo-box {
-    display: flex;
-    align-items: center;
-
-    .logo {
-      width: 80px;
-      height: 80px;
-      margin-right: 24px;
-    }
-
-    .desc {
-      font-weight: bold;
-
-      .top-text {
-        font-size: 36px;
-        font-weight: 700;
-      }
-
-      .bottom-text {
-        font-size: 20px;
-      }
-    }
+@media (max-width: 768px) {
+  .about-block {
+    display: none;
   }
-
 }
 </style>
