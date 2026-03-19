@@ -22,9 +22,6 @@ const props = defineProps<{
   loading?: boolean;
 }>();
 
-// 注意：wrapper 不持有 close 逻辑，关闭由 slot 内容中的按钮直接调用
-// 父组件的 handleCloseModal，不需要 wrapper 转发 close emit
-
 const entered = ref(false);
 const realLoading = computed(() => !entered.value || props.loading);
 

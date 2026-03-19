@@ -5,7 +5,7 @@
       :space-between="0"
       @swiper="handleSwiper"
       :speed="720"
-      :simulate-touch="false"
+      :simulate-touch="isMobile"
       loop
     >
       <swiper-slide v-for="photo in album?.photos || []" :key="photo.id">
@@ -20,7 +20,8 @@
             v-show="imageLoadedState[photo.id!]"
             @load="imageLoadedState[photo.id!] = true"
             :id="`image-id-${photo.id}`"
-            class="album-modal-img object-contain max-h-full max-w-full h-full w-full"
+            class="album-modal-img max-h-full max-w-full h-full w-full"
+            :class="props.cover ? 'object-cover' : 'object-contain'"
             :src="matchImageUrl(photo.image, 'higher', '1080p')"
           />
         </div>
@@ -52,6 +53,9 @@ import LoadingPlaceholder from './loading-placeholder.vue';
 import { ref, watchEffect, computed, watch } from 'vue';
 import { AlbumRes } from '@/typings';
 import { matchImageUrl } from '@/utils';
+import { useScrollOffset } from '@/composables/useScrollOffset';
+
+const { isMobile } = useScrollOffset();
 
 const emit = defineEmits<{
   (e: 'slideChange', photo: AlbumRes['photos'][0]): void;
@@ -60,6 +64,7 @@ const emit = defineEmits<{
 
 const props = defineProps<{
   album: AlbumRes | null;
+  cover?: boolean;
 }>();
 
 const swiperRef = ref<SwiperInner>();
@@ -154,5 +159,12 @@ const slidePrev = () => {
 
 .swiper-wrapper {
   transition-timing-function: cubic-bezier(0.76, 0.09, 0.215, 1);
+}
+
+@media (max-width: 768px) {
+  .left-arrow,
+  .right-arrow {
+    display: none;
+  }
 }
 </style>
