@@ -266,6 +266,7 @@ const fetchAlbumDetail = async (id: string) => {
     loading.value = false;
     const res = albumCache.get(id);
     albumDetail.value = res;
+    return;
   }
 
   loading.value = true;
@@ -358,13 +359,14 @@ const handleFullScreenClick = () => {
 .mobile-photo-area {
   flex-grow: 1;
   position: relative;
-  transition: flex-basis 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: min-height 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   background: #212121;
 
   &.expanded {
     flex-grow: 0;
-    flex-basis: max(200px, 28vh);
     flex-shrink: 0;
+    min-height: max(200px, 28vh);
+    max-height: max(200px, 28vh);
   }
 }
 
