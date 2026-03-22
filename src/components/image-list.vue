@@ -5,7 +5,7 @@
     :column-width="isMobile ? 160 : 300"
     :min-columns="1"
     :max-columns="isMobile ? 2 : 5"
-    :gap="isMobile ? 4 : 32"
+    :gap="isMobile ? 12 : 32"
   >
     <template #default="{ item, index }">
       <image-item :item="item" :key="index" />
@@ -32,7 +32,7 @@ const { isMobile } = useScrollOffset();
 
   @media (max-width: 768px) {
     margin: 0;
-    padding: 6px;
+    padding: 12px;
   }
 }
 </style>

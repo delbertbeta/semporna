@@ -68,4 +68,19 @@ const handleItemClick = () => {
   max-height: 600px;
   object-fit: cover;
 }
+
+@media (max-width: 768px) {
+  .image-box {
+    padding: 0;
+    border: 0;
+    box-shadow: none;
+    background-color: transparent;
+    border-radius: 4px;
+
+    &:hover {
+      box-shadow: none;
+      transform: translateY(0);
+    }
+  }
+}
 </style>

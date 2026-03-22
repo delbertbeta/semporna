@@ -18,16 +18,6 @@ export const useAppStore = defineStore('app', () => {
 
   const isAnyModalOpen = computed(() => showAlbumModal.value);
 
-  const mobileDrawerOpen = ref(false);
-
-  const toggleMobileDrawer = () => {
-    mobileDrawerOpen.value = !mobileDrawerOpen.value;
-  };
-
-  const closeMobileDrawer = () => {
-    mobileDrawerOpen.value = false;
-  };
-
   return {
     isAnyModalOpen,
 
@@ -36,9 +26,5 @@ export const useAppStore = defineStore('app', () => {
     closeAlbumModal,
 
     currentAlbumItem,
-
-    mobileDrawerOpen,
-    toggleMobileDrawer,
-    closeMobileDrawer,
   };
 });

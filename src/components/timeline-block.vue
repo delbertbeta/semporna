@@ -35,13 +35,10 @@ import { useAlbumStore } from '@/store/album';
 import { computed, watch, nextTick, ref } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useScrollOffset } from '@/composables/useScrollOffset';
-import { useAppStore } from '@/store';
 
 const albumStore = useAlbumStore();
 const { albums, activeYear, activeMonth } = storeToRefs(albumStore);
 const { setActiveDate } = albumStore;
-
-const appStore = useAppStore();
 const { isMobile, scrollOffset } = useScrollOffset();
 
 const timelineData = computed(() => {
@@ -159,9 +156,6 @@ const toggleYear = (year: number) => {
 const toggleMonth = (year: number, month: number) => {
   setActiveDate(year, month);
   scrollToImage(year, month);
-  if (isMobile.value) {
-    appStore.closeMobileDrawer();
-  }
 };
 </script>
 

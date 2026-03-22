@@ -1,29 +1,39 @@
 <template>
-  <div class="full-screen-banner fade-in">
-    <button
-      v-if="isMobile"
-      class="hamburger-btn"
-      @click="toggleMobileDrawer"
-    >
-      <span>&#9776;</span>
-    </button>
+  <div
+    class="full-screen-banner fade-in"
+    :class="{
+      'is-mobile-banner-transitioning': isBannerTransitioning,
+      'is-mobile-banner-swiping': isBannerSwiping,
+    }"
+  >
     <swiper
       class="full-screen-banner-slider"
-      :space-between="-36"
+      :space-between="isMobile ? 0 : -36"
       :autoplay="{ delay: 10000 }"
       :modules="modules"
       loop
       @autoplayTimeLeft="onAutoplayTimeLeft"
       @swiper="handleSwiper"
+      @slideChangeTransitionStart="beginMobileBannerTransition"
+      @slideChangeTransitionEnd="endMobileBannerTransition"
+      @sliderFirstMove="beginMobileBannerSwipe"
+      @touchMoveOpposite="cancelMobileBannerTransition"
+      @touchEnd="settleMobileBannerTransition"
       :speed="720"
       :simulate-touch="isMobile"
       :loop-additional-slides="3"
     >
       <swiper-slide v-for="album in targetAlbums" :key="album.id">
         <div class="full-screen-banner-slider-item">
+          <div class="info-tag-backdrop" />
           <div class="info-tag">
-            <div class="into-year">
-              {{ dayjs(album.date).format('YYYY/MM') }}
+            <div class="info-tag-text">
+              <div class="into-year">
+                {{ dayjs(album.date).format('YYYY/MM') }}
+              </div>
+              <div v-if="album.subArea || album.mainArea" class="into-location">
+                {{ formatAlbumLocation(album) }}
+              </div>
             </div>
           </div>
           <img
@@ -62,22 +72,85 @@ import { useAppStore } from '@/store';
 import dayjs from 'dayjs';
 import 'swiper/css';
 
-import { computed, ref, watch } from 'vue';
+import { computed, onUnmounted, ref, watch } from 'vue';
 import { AlbumMeta } from '@/typings';
 import { useAlbumStore } from '@/store/album';
 import { useScrollOffset } from '@/composables/useScrollOffset';
 
 const albumStore = useAlbumStore();
 const appStore = useAppStore();
-const { toggleMobileDrawer } = appStore;
 const { isAnyModalOpen } = storeToRefs(appStore);
 const { isMobile } = useScrollOffset();
 const { albums } = storeToRefs(albumStore);
 const modules = [Autoplay];
 const swiperRef = ref<SwiperInner>();
 const progressBar = ref<HTMLDivElement>();
+const isBannerTransitioning = ref(false);
+const isBannerSwiping = ref(false);
+let bannerTransitionTimer: ReturnType<typeof setTimeout> | undefined;
 
 const targetAlbums = computed(() => albums.value.slice(0, 3));
+
+const formatAlbumLocation = (album: AlbumMeta) => {
+  if (album.subArea && album.mainArea) {
+    return `${album.subArea}, ${album.mainArea}`;
+  }
+
+  return album.subArea || album.mainArea || '';
+};
+
+const clearBannerTransitionTimer = () => {
+  if (bannerTransitionTimer) {
+    clearTimeout(bannerTransitionTimer);
+    bannerTransitionTimer = undefined;
+  }
+};
+
+const beginMobileBannerTransition = () => {
+  if (!isMobile.value) {
+    return;
+  }
+
+  clearBannerTransitionTimer();
+  isBannerTransitioning.value = true;
+};
+
+const beginMobileBannerSwipe = () => {
+  if (!isMobile.value) {
+    return;
+  }
+
+  clearBannerTransitionTimer();
+  isBannerSwiping.value = true;
+  isBannerTransitioning.value = true;
+};
+
+const settleMobileBannerTransition = () => {
+  if (!isMobile.value) {
+    return;
+  }
+
+  clearBannerTransitionTimer();
+  bannerTransitionTimer = setTimeout(() => {
+    isBannerTransitioning.value = false;
+    isBannerSwiping.value = false;
+    bannerTransitionTimer = undefined;
+  }, 140);
+};
+
+const endMobileBannerTransition = () => {
+  settleMobileBannerTransition();
+};
+
+const cancelMobileBannerTransition = () => {
+  if (!isMobile.value) {
+    return;
+  }
+
+  clearBannerTransitionTimer();
+  isBannerTransitioning.value = false;
+  isBannerSwiping.value = false;
+};
 
 const handleSwiper = (swiper: SwiperInner) => {
   swiperRef.value = swiper;
@@ -95,10 +168,12 @@ const onAutoplayTimeLeft = throttle(
 );
 
 const slideNext = () => {
+  beginMobileBannerTransition();
   swiperRef.value?.slideNext();
 };
 
 const slidePrev = () => {
+  beginMobileBannerTransition();
   swiperRef.value?.slidePrev();
 };
 
@@ -112,6 +187,10 @@ watch(isAnyModalOpen, (newValue) => {
   } else {
     swiperRef.value?.autoplay.start();
   }
+});
+
+onUnmounted(() => {
+  clearBannerTransitionTimer();
 });
 </script>
 
@@ -137,6 +216,7 @@ watch(isAnyModalOpen, (newValue) => {
 }
 
 .full-screen-banner-slider-item {
+  position: relative;
   height: 100%;
   width: calc(100% - 64px);
 
@@ -149,25 +229,33 @@ watch(isAnyModalOpen, (newValue) => {
   }
 }
 
-.swiper-slide-active {
-  .info-tag {
-    opacity: 1;
-    transform: translateY(0px);
+  .swiper-slide-active {
+    .info-tag {
+      opacity: 1;
+      transform: translateY(0px);
+    }
   }
-}
 
 .info-tag {
   position: absolute;
   top: -64px;
   left: 32px;
+  z-index: 2;
   opacity: 0;
   transform: translateY(20px);
+  pointer-events: none;
 
-  transition: opacity 0.42s ease-in-out 0.3s, transform 0.42s ease-in-out 0.3s;
+    transition:
+      opacity 0.42s ease-in-out 0.3s,
+      transform 0.42s ease-in-out 0.3s;
 
   .into-year {
     font-size: 96px;
     font-weight: lighter;
+  }
+
+  .into-location {
+    display: none;
   }
 
   .into-bar {
@@ -187,6 +275,10 @@ watch(isAnyModalOpen, (newValue) => {
     background-color: white;
     display: inline-block;
   }
+}
+
+.info-tag-backdrop {
+  display: none;
 }
 
 .scroll-down {
@@ -254,6 +346,7 @@ watch(isAnyModalOpen, (newValue) => {
 .autoplay-progress {
   background-color: rgba(0, 0, 0, 0.1);
   position: absolute;
+  z-index: 3;
   top: -20px;
   right: 64px;
   height: 4px;
@@ -272,34 +365,14 @@ watch(isAnyModalOpen, (newValue) => {
   transition: width 0.1s ease;
 }
 
-.hamburger-btn {
-  display: none;
-
-  @media (max-width: 768px) {
-    display: flex;
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    z-index: 10;
-    width: 28px;
-    height: 28px;
-    border: none;
-    border-radius: 6px;
-    background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(8px);
-    color: white;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-size: 14px;
-    padding: 0;
-  }
-}
-
 @media (max-width: 768px) {
   .left-arrow,
   .right-arrow {
     display: none;
+  }
+
+  .full-screen-banner-slider-item {
+    width: 100%;
   }
 
   .scroll-down {
@@ -307,14 +380,37 @@ watch(isAnyModalOpen, (newValue) => {
   }
 
   .full-screen-banner {
-    height: 55vw;
+    height: 100vh;
+    height: 100dvh;
+    display: block;
+    box-sizing: border-box;
+    padding-top: calc(env(safe-area-inset-top) + 46px);
   }
 
   .full-screen-banner-slider {
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    width: 100%;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .full-screen-banner-slider-item > .full-screen-banner-img {
+    border-radius: 0;
+    transform: scale(1);
+    transform-origin: center center;
+    transition:
+      border-radius 420ms cubic-bezier(0.32, 0.72, 0, 1),
+      transform 420ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .is-mobile-banner-transitioning .full-screen-banner-slider-item > .full-screen-banner-img {
+    border-radius: 64px;
+    transform: scale(0.8);
   }
 
   .autoplay-progress {
@@ -327,23 +423,97 @@ watch(isAnyModalOpen, (newValue) => {
   // 将日期标签移到 Banner 底部左侧
   .swiper-slide-active .info-tag {
     top: unset;
-    bottom: 14px;
-    left: 14px;
+    bottom: 0;
+    left: 0;
+    right: 0;
     opacity: 1;
     transform: translateY(0);
+    transition-delay: 0.2s, 0.2s;
   }
 
   .info-tag {
     top: unset;
-    bottom: 14px;
-    left: 14px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 16px 22px;
+    z-index: 2;
   }
 
-  .into-year {
-    font-size: 18px;
-    font-weight: 600;
+  .is-mobile-banner-swiping .info-tag {
+    opacity: 0;
+    transform: translateY(14px);
+    transition-delay: 0s, 0s;
+    transition-duration: 0.1s, 0.1s;
+  }
+
+  .info-tag-backdrop {
+    display: block;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 112px;
+    z-index: 1;
+    opacity: 0;
+    transform: scaleY(0.5);
+    transform-origin: bottom center;
+    background: rgba(18, 19, 21, 0.26);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 55%, rgba(0, 0, 0, 0) 100%);
+    -webkit-mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 55%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    pointer-events: none;
+    transition:
+      opacity 0.35s ease-in-out,
+      transform 0.35s ease-in-out;
+  }
+
+  .swiper-slide-active .info-tag-backdrop {
+    opacity: 1;
+    transform: scaleY(1);
+    transition-delay: 0.2s, 0.2s;
+  }
+
+  .is-mobile-banner-swiping .info-tag-backdrop {
+    opacity: 0;
+    transform: scaleY(0.5);
+    transition-delay: 0s, 0s;
+    transition-duration: 0.1s, 0.1s;
+  }
+
+  .info-tag-text {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .info-tag .into-year {
+    display: block;
+    width: 100%;
+    font-size: 20vw;
+    letter-spacing: 0.08em;
+    line-height: 1.1;
     color: white;
     text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    white-space: nowrap;
   }
+
+  .info-tag .into-location {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: rgba(255, 255, 255, 0.86);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  }
+
 }
 </style>

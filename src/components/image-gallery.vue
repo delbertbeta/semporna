@@ -1,5 +1,6 @@
 <template>
   <div class="scroll-wrapper" @scroll="handleScroll">
+    <mobile-banner-brand v-if="isMobile" />
     <full-screen-banner />
     <mobile-month-tabs v-if="isMobile" />
     <image-list />
@@ -10,6 +11,7 @@
 import { watch, onUnmounted } from 'vue';
 import ImageList from './image-list.vue';
 import FullScreenBanner from './full-screen-banner.vue';
+import MobileBannerBrand from './mobile-banner-brand.vue';
 import { useAlbumStore } from '@/store/album';
 import { throttle } from 'lodash-es';
 import { useScrollOffset } from '@/composables/useScrollOffset';
