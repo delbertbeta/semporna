@@ -37,7 +37,7 @@ const handleMouseLeave = () => {
 };
 
 const handleItemClick = () => {
-  openAlbumModal(props.item);
+  void openAlbumModal(props.item);
 };
 </script>
 

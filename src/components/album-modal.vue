@@ -7,6 +7,10 @@
   >
     <div
       class="album-modal-mobile"
+      :class="{
+        'mobile-info-expanded': isExpanded,
+        'mobile-photo-zoomed': isMobilePhotoZoomed,
+      }"
       :style="{
         '--mobile-info-panel-height': isExpanded
           ? 'clamp(280px, 34vh, 360px)'
@@ -20,6 +24,7 @@
           :cover="false"
           @slideChange="handleSlideChange"
           @image-loading-state="handleImageLoadingState"
+          @zoom-state-change="handleMobileZoomStateChange"
         />
 
         <!-- 顶部栏 -->
@@ -30,7 +35,13 @@
               · {{ albumDetail.subArea }}
             </template>
             <template v-if="albumDetail?.date">
-              · {{ new Date(albumDetail.date).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit' }) }}
+              ·
+              {{
+                new Date(albumDetail.date).toLocaleDateString('zh-CN', {
+                  year: 'numeric',
+                  month: '2-digit',
+                })
+              }}
             </template>
           </span>
           <div class="mobile-top-actions">
@@ -41,7 +52,11 @@
             >
               <ExclamationCircleIcon class="size-4" />
             </button>
-            <button class="mobile-close-btn" type="button" @click="handleCloseModal">
+            <button
+              class="mobile-close-btn"
+              type="button"
+              @click="handleCloseModal"
+            >
               <XMarkIcon class="size-4" />
             </button>
           </div>
@@ -75,7 +90,6 @@
             }"
           />
         </div>
-
       </div>
 
       <!-- Peek 栏（沉浸状态时显示，展开后隐藏） -->
@@ -95,11 +109,7 @@
 
       <!-- 展开状态：信息面板 -->
       <transition name="info-slide">
-        <div
-          v-if="isExpanded"
-          ref="infoPanelRef"
-          class="mobile-info-panel"
-        >
+        <div v-if="isExpanded" ref="infoPanelRef" class="mobile-info-panel">
           <div class="peek-handle" @click="isExpanded = false" />
           <div class="mobile-info-scroll">
             <svg-icon
@@ -148,40 +158,47 @@
 
 <script setup lang="ts">
 import { useAppStore } from '@/store';
-import { storeToRefs } from 'pinia';
 import Modal from './modal.vue';
 import AlbumModalToolbar from './album-modal-toolbar.vue';
 import AlbumModalInfo from './album-modal-info.vue';
 import AlbumModalSlider from './album-modal-slider.vue';
 import AlbumExifPanel from './album-exif-panel.vue';
 import fullScreenViewer from './full-screen-viewer.vue';
-import { ref, watch, watchEffect } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { getAlbumById } from '@/request';
 import { AlbumRes } from '@/typings';
 import { useScrollOffset } from '@/composables/useScrollOffset';
 import { useSwipe } from '@vueuse/core';
-import {
-  ExclamationCircleIcon,
-  XMarkIcon,
-} from '@heroicons/vue/24/outline';
+import { useRoute } from 'vue-router';
+import { ExclamationCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import MobileModalWrapper from './mobile-modal-wrapper.vue';
+import {
+  ALBUM_ROUTE_NAME,
+} from '@/utils/album-route';
 
 const store = useAppStore();
 const { closeAlbumModal } = store;
-const { showAlbumModal, currentAlbumItem } = storeToRefs(store);
+const route = useRoute();
 
 const { isMobile } = useScrollOffset();
 
-const albumCache = new Map();
+const showAlbumModal = computed(() => route.name === ALBUM_ROUTE_NAME);
+const albumRouteId = computed(() =>
+  typeof route.params.albumId === 'string' ? route.params.albumId : undefined
+);
+
+const albumCache = new Map<string, AlbumRes>();
 const loading = ref(false);
 const albumDetail = ref<AlbumRes | null>(null);
 const currentPhoto = ref<AlbumRes['photos'][0] | null>(null);
 const isImageLoading = ref(true);
+const activeAlbumRequestId = ref<string | null>(null);
 
 // 移动端展开状态
 const isExpanded = ref(false);
 const currentSlideIndexMobile = ref(0);
 const showMobileExif = ref(false);
+const isMobilePhotoZoomed = ref(false);
 
 // peek 栏 / info panel 的 swipe ref
 const peekRef = ref<HTMLElement | null>(null);
@@ -214,7 +231,8 @@ const handleImageLoadingState = (loadingState: boolean) => {
 const handleSlideChange = (photo: AlbumRes['photos'][0]) => {
   currentPhoto.value = photo;
   showMobileExif.value = false;
-  const idx = albumDetail.value?.photos?.findIndex(p => p.id === photo.id);
+  isMobilePhotoZoomed.value = false;
+  const idx = albumDetail.value?.photos?.findIndex((p) => p.id === photo.id);
   if (idx !== undefined && idx >= 0) {
     currentSlideIndexMobile.value = idx;
   }
@@ -228,50 +246,92 @@ const toggleMobileExif = () => {
   showMobileExif.value = !showMobileExif.value;
 };
 
+const handleMobileZoomStateChange = (zoomed: boolean) => {
+  isMobilePhotoZoomed.value = zoomed;
+};
+
 const fetchAlbumDetail = async (id: string) => {
+  activeAlbumRequestId.value = id;
+
   if (albumCache.has(id)) {
     loading.value = false;
-    const res = albumCache.get(id);
-    albumDetail.value = res;
+    albumDetail.value = albumCache.get(id) || null;
     return;
   }
 
   loading.value = true;
   try {
     const res = await getAlbumById(id);
+    if (activeAlbumRequestId.value !== id) {
+      return;
+    }
+
     if (res.data.data.album) {
       albumCache.set(id, res.data.data.album);
       albumDetail.value = res.data.data.album;
+      return;
     }
+
+    albumDetail.value = null;
+    await closeAlbumModal();
   } catch (error) {
     console.error('Failed to fetch album detail:', error);
+    if (activeAlbumRequestId.value === id) {
+      albumDetail.value = null;
+      await closeAlbumModal();
+    }
   } finally {
-    loading.value = false;
+    if (activeAlbumRequestId.value === id) {
+      loading.value = false;
+    }
   }
 };
 
-// 监听 currentAlbumItem 变化，自动加载数据
-watchEffect(() => {
-  if (currentAlbumItem.value?.id) {
-    fetchAlbumDetail(currentAlbumItem.value.id);
+watch(
+  albumRouteId,
+  (albumId) => {
     currentSlideIndexMobile.value = 0;
     isExpanded.value = false;
     showMobileExif.value = false;
+    isMobilePhotoZoomed.value = false;
     currentPhoto.value = null;
-  }
-});
+    isImageLoading.value = true;
 
-// 数据加载完成后初始化 currentPhoto（避免首次打开 peek 栏为空）
-watch(albumDetail, (detail) => {
-  if (detail?.photos?.length && !currentPhoto.value) {
-    currentPhoto.value = detail.photos[0];
+    if (!albumId) {
+      activeAlbumRequestId.value = null;
+      albumDetail.value = null;
+      loading.value = false;
+      return;
+    }
+
+    void fetchAlbumDetail(albumId);
+  },
+  {
+    immediate: true,
   }
-});
+);
+
+watch(
+  [albumDetail, albumRouteId],
+  ([detail, albumId]) => {
+    if (!detail?.photos?.length || !albumId) {
+      currentPhoto.value = null;
+      return;
+    }
+
+    currentPhoto.value = detail.photos[0];
+    currentSlideIndexMobile.value = 0;
+  },
+  {
+    immediate: true,
+  }
+);
 
 const handleCloseModal = () => {
   isExpanded.value = false;
   showMobileExif.value = false;
-  closeAlbumModal();
+  isMobilePhotoZoomed.value = false;
+  void closeAlbumModal();
 };
 
 const fullscreenImage = ref();
@@ -332,6 +392,7 @@ const handleFullScreenClick = () => {
   position: relative;
   transition: height 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   background: #212121;
+  overflow: hidden;
 }
 
 .mobile-top-bar {
@@ -418,7 +479,7 @@ const handleFullScreenClick = () => {
   z-index: 12;
   height: calc(60px + @safe-area-bottom);
   padding-bottom: @safe-area-bottom;
-  background: rgba(245, 243, 240, 0.95);
+  background: rgba(245, 243, 240, 0.85);
   backdrop-filter: blur(24px) saturate(135%);
   -webkit-backdrop-filter: blur(24px) saturate(135%);
   border-top: 1px solid rgba(255, 255, 255, 0.28);
@@ -467,7 +528,7 @@ const handleFullScreenClick = () => {
   bottom: 0;
   z-index: 12;
   height: var(--mobile-info-panel-height);
-  background: rgba(245, 243, 240, 0.95);
+  background: rgba(245, 243, 240, 0.85);
   backdrop-filter: blur(24px) saturate(135%);
   -webkit-backdrop-filter: blur(24px) saturate(135%);
   border-top: 1px solid rgba(255, 255, 255, 0.28);
@@ -479,6 +540,12 @@ const handleFullScreenClick = () => {
   padding-top: 16px;
   align-items: center;
   box-sizing: border-box;
+}
+
+.album-modal-mobile.mobile-info-expanded.mobile-photo-zoomed {
+  .mobile-photo-area {
+    overflow: visible;
+  }
 }
 
 .mobile-info-scroll {
@@ -540,7 +607,9 @@ const handleFullScreenClick = () => {
 
 .info-slide-enter-active,
 .info-slide-leave-active {
-  transition: opacity 0.2s ease, transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  transition:
+    opacity 0.2s ease,
+    transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .info-slide-enter-from,

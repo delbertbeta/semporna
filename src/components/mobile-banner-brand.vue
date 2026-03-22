@@ -30,6 +30,7 @@
   width: 28px;
   height: 28px;
   flex: 0 0 auto;
+  margin-left: -22px;
 }
 
 .mobile-banner-brand-text {

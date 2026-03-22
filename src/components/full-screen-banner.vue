@@ -7,6 +7,7 @@
     }"
   >
     <swiper
+      v-if="targetAlbums.length"
       class="full-screen-banner-slider"
       :space-between="isMobile ? 0 : -36"
       :autoplay="{ delay: 10000 }"
@@ -21,7 +22,6 @@
       @touchEnd="settleMobileBannerTransition"
       :speed="720"
       :simulate-touch="isMobile"
-      :loop-additional-slides="3"
     >
       <swiper-slide v-for="album in targetAlbums" :key="album.id">
         <div class="full-screen-banner-slider-item">
@@ -178,7 +178,7 @@ const slidePrev = () => {
 };
 
 const handleBannerClick = (album: AlbumMeta) => {
-  appStore.openAlbumModal(album);
+  void appStore.openAlbumModal(album);
 };
 
 watch(isAnyModalOpen, (newValue) => {
@@ -252,6 +252,7 @@ onUnmounted(() => {
   .into-year {
     font-size: 96px;
     font-weight: lighter;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
   }
 
   .into-location {

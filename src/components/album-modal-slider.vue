@@ -1,5 +1,8 @@
 <template>
-  <div class="album-modal-slider-container absolute w-full h-full">
+  <div
+    class="album-modal-slider-container absolute w-full h-full"
+    :class="{ 'mobile-zoom-active': isMobile && currentZoomScale > 1.01 }"
+  >
     <swiper
       class="album-modal-slider w-full h-full"
       :modules="modules"
@@ -67,6 +70,7 @@ const { isMobile } = useScrollOffset();
 const emit = defineEmits<{
   (e: 'slideChange', photo: AlbumRes['photos'][0]): void;
   (e: 'image-loading-state', loading: boolean): void;
+  (e: 'zoom-state-change', zoomed: boolean): void;
 }>();
 
 const props = defineProps<{
@@ -104,6 +108,7 @@ const canResetZoom = (swiper: SwiperInner) => {
 const resetZoomState = (swiper: SwiperInner) => {
   swiper.allowTouchMove = true;
   currentZoomScale.value = 1;
+  emit('zoom-state-change', false);
 
   if (!isMobile.value || swiper.zoom.scale <= 1.01) {
     return;
@@ -159,6 +164,7 @@ const handleSwiper = (swiper: SwiperInner) => {
 
 const handleZoomChange = (_swiper: SwiperInner, scale: number) => {
   currentZoomScale.value = scale;
+  emit('zoom-state-change', scale > 1.01);
   if (swiperRef.value) {
     swiperRef.value.allowTouchMove = scale <= 1.01;
   }
@@ -178,6 +184,8 @@ watch(
     if (swiperRef.value) {
       resetZoomState(swiperRef.value);
     }
+
+    currentSlideIndex.value = 0;
   }
 );
 </script>
@@ -230,6 +238,18 @@ watch(
 }
 
 @media (max-width: 768px) {
+  .mobile-zoom-active {
+    overflow: visible;
+
+    .album-modal-slider,
+    :deep(.swiper),
+    :deep(.swiper-wrapper),
+    :deep(.swiper-slide),
+    .album-modal-slider-item {
+      overflow: visible;
+    }
+  }
+
   .left-arrow,
   .right-arrow {
     display: none;
