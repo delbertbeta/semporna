@@ -1,78 +1,142 @@
 <!-- src/components/mobile-month-tabs.vue -->
 <template>
-  <div class="mobile-month-tabs" ref="tabsRef">
-    <div
-      v-for="item in tabList"
-      :key="`${item.year}-${item.month}`"
-      class="month-tab"
-      :class="{ active: activeYear === item.year && activeMonth === item.month }"
-      @click="handleTabClick(item.year, item.month)"
-    >
-      {{ item.year }}/{{ String(item.month).padStart(2, '0') }}
+  <div class="mobile-month-tabs">
+    <div class="year-tabs" ref="yearTabsRef">
+      <div
+        v-for="item in timelineData"
+        :key="item.year"
+        class="year-tab"
+        :class="{ active: activeYear === item.year }"
+        @click="toggleYear(item.year)"
+      >
+        {{ item.year }}
+      </div>
     </div>
+
+    <transition name="month-slide">
+      <div
+        v-if="activeTimelineItem"
+        class="month-tabs"
+        ref="monthTabsRef"
+      >
+        <div
+          v-for="month in activeTimelineItem.months"
+          :key="month"
+          class="month-tab"
+          :class="{ active: activeMonth === month }"
+          @click="toggleMonth(activeTimelineItem.year, month)"
+        >
+          {{ month }} 月
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, nextTick } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useAlbumStore } from '@/store/album';
+import { useScrollOffset } from '@/composables/useScrollOffset';
 
 const albumStore = useAlbumStore();
 const { albums, activeYear, activeMonth } = storeToRefs(albumStore);
 const { setActiveDate } = albumStore;
+const { scrollOffset } = useScrollOffset();
 
-const tabsRef = ref<HTMLElement | null>(null);
+const yearTabsRef = ref<HTMLElement | null>(null);
+const monthTabsRef = ref<HTMLElement | null>(null);
 
-// 生成扁平化 year/month 列表，按时间倒序
-const tabList = computed(() => {
-  const result: { year: number; month: number }[] = [];
+const timelineData = computed(() => {
   const yearMap: Record<number, Set<number>> = {};
+
   albums.value.forEach((album) => {
     const date = new Date(album.date);
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
-    if (!yearMap[year]) yearMap[year] = new Set();
+
+    if (!yearMap[year]) {
+      yearMap[year] = new Set();
+    }
+
     yearMap[year].add(month);
   });
-  Object.keys(yearMap)
-    .map(Number)
-    .sort((a, b) => b - a)
-    .forEach((year) => {
-      Array.from(yearMap[year])
-        .sort((a, b) => a - b)
-        .forEach((month) => result.push({ year, month }));
-    });
-  return result;
+
+  return Object.keys(yearMap)
+    .map((yearStr) => {
+      const year = Number(yearStr);
+      const months = Array.from(yearMap[year]).sort((a, b) => a - b);
+      return { year, months };
+    })
+    .sort((a, b) => b.year - a.year);
 });
 
-const handleTabClick = (year: number, month: number) => {
-  setActiveDate(year, month);
-  scrollToImage(year, month);
-};
+const activeTimelineItem = computed(() =>
+  timelineData.value.find((item) => item.year === activeYear.value) ?? null
+);
+
+watch(
+  timelineData,
+  (newTimelineData) => {
+    if (newTimelineData.length > 0 && activeYear.value === null) {
+      const latestYear = newTimelineData[0].year;
+      const latestMonth = newTimelineData[0].months[0];
+      setActiveDate(latestYear, latestMonth);
+    }
+  },
+  { immediate: true }
+);
 
 const scrollToImage = (year: number, month: number) => {
   const target = document.querySelector(
     `.image-box[data-year='${year}'][data-month='${month}']`
-  ) as HTMLElement;
-  if (target) {
-    const tabHeight = tabsRef.value?.offsetHeight || 36;
-    const bannerHeight = window.innerWidth * 0.55;
-    const offset = bannerHeight + tabHeight;
-    window.scrollTo({
-      top: target.getBoundingClientRect().top + window.scrollY - offset,
-      behavior: 'smooth',
-    });
-  }
+  ) as HTMLElement | null;
+
+  if (!target) return;
+
+  window.scrollTo({
+    top: target.getBoundingClientRect().top + window.scrollY - scrollOffset.value,
+    behavior: 'smooth',
+  });
 };
 
-// 激活月份变化时，将其滚动到 Tab 栏中央
+const toggleYear = (year: number) => {
+  if (activeYear.value === year) return;
+
+  const yearData = timelineData.value.find((item) => item.year === year);
+  if (!yearData || yearData.months.length === 0) return;
+
+  const month = yearData.months[0];
+  setActiveDate(year, month);
+  scrollToImage(year, month);
+};
+
+const toggleMonth = (year: number, month: number) => {
+  setActiveDate(year, month);
+  scrollToImage(year, month);
+};
+
 watch([activeYear, activeMonth], async () => {
   await nextTick();
-  const activeTab = tabsRef.value?.querySelector('.month-tab.active') as HTMLElement;
-  if (activeTab) {
-    activeTab.scrollIntoView({ inline: 'center', behavior: 'smooth' });
-  }
+
+  const activeYearTab = yearTabsRef.value?.querySelector(
+    '.year-tab.active'
+  ) as HTMLElement | null;
+  const activeMonthTab = monthTabsRef.value?.querySelector(
+    '.month-tab.active'
+  ) as HTMLElement | null;
+
+  activeYearTab?.scrollIntoView({
+    behavior: 'smooth',
+    inline: 'center',
+    block: 'nearest',
+  });
+
+  activeMonthTab?.scrollIntoView({
+    behavior: 'smooth',
+    inline: 'center',
+    block: 'nearest',
+  });
 });
 </script>
 
@@ -81,16 +145,17 @@ watch([activeYear, activeMonth], async () => {
   position: sticky;
   top: 0;
   z-index: 10;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
   background: rgba(245, 243, 240, 0.92);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.year-tabs,
+.month-tabs {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
   padding: 0 12px;
-  gap: 16px;
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
@@ -98,20 +163,60 @@ watch([activeYear, activeMonth], async () => {
   }
 }
 
+.year-tabs {
+  height: 36px;
+  gap: 16px;
+}
+
+.month-tabs {
+  height: 32px;
+  gap: 14px;
+  border-top: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.year-tab,
 .month-tab {
   flex-shrink: 0;
-  scroll-snap-align: center;
-  font-size: 13px;
-  font-weight: bold;
-  color: rgba(0, 0, 0, 0.35);
   cursor: pointer;
-  padding-bottom: 2px;
   white-space: nowrap;
+  font-weight: bold;
   transition: color 0.2s ease;
+}
+
+.year-tab {
+  font-size: 13px;
+  color: rgba(0, 0, 0, 0.35);
+
+  &.active {
+    color: #121315;
+  }
+}
+
+.month-tab {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.35);
+  padding-bottom: 2px;
 
   &.active {
     color: #121315;
     border-bottom: 2px solid #121315;
   }
+}
+
+.month-slide-enter-active,
+.month-slide-leave-active {
+  transition: all 0.25s ease;
+}
+
+.month-slide-enter-from,
+.month-slide-leave-to {
+  opacity: 0;
+  max-height: 0;
+}
+
+.month-slide-enter-to,
+.month-slide-leave-from {
+  opacity: 1;
+  max-height: 32px;
 }
 </style>
