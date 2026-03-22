@@ -5,15 +5,19 @@
     :visible="showAlbumModal"
     :loading="loading"
   >
-    <div class="album-modal-mobile">
+    <div
+      class="album-modal-mobile"
+      :style="{
+        '--mobile-info-panel-height': isExpanded
+          ? 'clamp(280px, 34vh, 360px)'
+          : '0px',
+      }"
+    >
       <!-- 照片 Swiper（始终全屏，cover 模式） -->
-      <div
-        class="mobile-photo-area"
-        :class="{ expanded: isExpanded }"
-      >
+      <div class="mobile-photo-area">
         <album-modal-slider
           :album="albumDetail"
-          :cover="true"
+          :cover="false"
           @slideChange="handleSlideChange"
           @image-loading-state="handleImageLoadingState"
         />
@@ -22,14 +26,42 @@
         <div class="mobile-top-bar">
           <span class="mobile-top-location">
             {{ albumDetail?.mainArea }}
-            <template v-if="currentPhoto?.image.exif.dateTime">
-              · {{ new Date(currentPhoto.image.exif.dateTime).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit' }) }}
+            <template v-if="albumDetail?.subArea">
+              · {{ albumDetail.subArea }}
+            </template>
+            <template v-if="albumDetail?.date">
+              · {{ new Date(albumDetail.date).toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit' }) }}
             </template>
           </span>
-          <button class="mobile-close-btn" @click="handleCloseModal">
-            <XMarkIcon class="size-4" />
-          </button>
+          <div class="mobile-top-actions">
+            <button
+              class="mobile-info-btn"
+              type="button"
+              @click.stop="toggleMobileExif"
+            >
+              <ExclamationCircleIcon class="size-4" />
+            </button>
+            <button class="mobile-close-btn" type="button" @click="handleCloseModal">
+              <XMarkIcon class="size-4" />
+            </button>
+          </div>
         </div>
+
+        <transition name="mobile-exif-fade">
+          <div
+            v-if="showMobileExif"
+            class="mobile-exif-overlay"
+            @click="closeMobileExif"
+          >
+            <div class="mobile-exif-popover" @click.stop>
+              <album-exif-panel
+                mobile
+                :photo="currentPhoto"
+                @close="closeMobileExif"
+              />
+            </div>
+          </div>
+        </transition>
 
         <!-- 进度条 -->
         <div class="mobile-progress-bar">
@@ -44,45 +76,6 @@
           />
         </div>
 
-        <!-- 展开状态下的 ⓘ 按钮（浮于照片右上角） -->
-        <Popover v-if="isExpanded" class="mobile-exif-popover-wrapper">
-          <PopoverButton class="outline-none">
-            <div class="mobile-exif-btn">
-              <ExclamationCircleIcon class="size-4" />
-            </div>
-          </PopoverButton>
-          <transition
-            enter-active-class="transition duration-200 ease-out"
-            enter-from-class="translate-y-1 opacity-0"
-            enter-to-class="translate-y-0 opacity-100"
-            leave-active-class="transition duration-150 ease-in"
-            leave-from-class="translate-y-0 opacity-100"
-            leave-to-class="translate-y-1 opacity-0"
-          >
-            <PopoverPanel class="mobile-exif-panel">
-              <div class="rounded-md bg-white w-full overflow-hidden">
-                <div class="text-text-main bg-green-transparent-1 h-7 px-3 font-bold w-full leading-7">
-                  {{ currentPhoto?.image.exif.dateTime ? new Date(currentPhoto.image.exif.dateTime).toLocaleString() : '未知拍摄时间' }}
-                </div>
-                <div class="flex flex-row items-start py-2 px-3">
-                  <ViewfinderCircleIcon class="size-4 mt-0.5" />
-                  <div class="flex flex-col font-medium ms-2 text-sm">
-                    <div>{{ currentPhoto?.image.exif.model || '未知相机' }}</div>
-                    <div>{{ currentPhoto?.image.exif.lens || '未知镜头' }}</div>
-                  </div>
-                </div>
-                <div class="bg-divider h-px mx-3" />
-                <div class="flex font-medium mt-1 mb-2 mx-3 text-sm gap-2">
-                  <span>{{ currentPhoto?.image.exif.fNumber || 'ƒ -' }}</span>
-                  <span>{{ currentPhoto?.image.exif.focalLength || '- mm' }}</span>
-                  <span>{{ currentPhoto?.image.exif.iso || 'ISO -' }}</span>
-                  <span>{{ currentPhoto?.image.exif.ev || '- ev' }}</span>
-                  <span>{{ currentPhoto?.image.exif.exposureTime || '- s' }}</span>
-                </div>
-              </div>
-            </PopoverPanel>
-          </transition>
-        </Popover>
       </div>
 
       <!-- Peek 栏（沉浸状态时显示，展开后隐藏） -->
@@ -97,44 +90,6 @@
           <span class="peek-title">
             {{ currentPhoto?.title || albumDetail?.mainArea }}
           </span>
-          <Popover class="peek-exif-wrapper">
-            <PopoverButton class="outline-none">
-              <div class="mobile-exif-btn peek-exif-btn">
-                <ExclamationCircleIcon class="size-4" />
-              </div>
-            </PopoverButton>
-            <transition
-              enter-active-class="transition duration-200 ease-out"
-              enter-from-class="translate-y-1 opacity-0"
-              enter-to-class="translate-y-0 opacity-100"
-              leave-active-class="transition duration-150 ease-in"
-              leave-from-class="translate-y-0 opacity-100"
-              leave-to-class="translate-y-1 opacity-0"
-            >
-              <PopoverPanel class="mobile-exif-panel">
-                <div class="rounded-md bg-white w-full overflow-hidden">
-                  <div class="text-text-main bg-green-transparent-1 h-7 px-3 font-bold w-full leading-7">
-                    {{ currentPhoto?.image.exif.dateTime ? new Date(currentPhoto.image.exif.dateTime).toLocaleString() : '未知拍摄时间' }}
-                  </div>
-                  <div class="flex flex-row items-start py-2 px-3">
-                    <ViewfinderCircleIcon class="size-4 mt-0.5" />
-                    <div class="flex flex-col font-medium ms-2 text-sm">
-                      <div>{{ currentPhoto?.image.exif.model || '未知相机' }}</div>
-                      <div>{{ currentPhoto?.image.exif.lens || '未知镜头' }}</div>
-                    </div>
-                  </div>
-                  <div class="bg-divider h-px mx-3" />
-                  <div class="flex font-medium mt-1 mb-2 mx-3 text-sm gap-2">
-                    <span>{{ currentPhoto?.image.exif.fNumber || 'ƒ -' }}</span>
-                    <span>{{ currentPhoto?.image.exif.focalLength || '- mm' }}</span>
-                    <span>{{ currentPhoto?.image.exif.iso || 'ISO -' }}</span>
-                    <span>{{ currentPhoto?.image.exif.ev || '- ev' }}</span>
-                    <span>{{ currentPhoto?.image.exif.exposureTime || '- s' }}</span>
-                  </div>
-                </div>
-              </PopoverPanel>
-            </transition>
-          </Popover>
         </div>
       </div>
 
@@ -147,15 +102,14 @@
         >
           <div class="peek-handle" @click="isExpanded = false" />
           <div class="mobile-info-scroll">
-            <div class="mobile-stamp-row">
-              <div class="mobile-stamp-circle" />
-              <div class="mobile-stamp-text">
-                <div class="mobile-stamp-from">From:</div>
-                <div class="mobile-stamp-city">{{ albumDetail?.mainArea }}</div>
-                <div class="mobile-stamp-sub">{{ albumDetail?.subArea }}</div>
-              </div>
-            </div>
+            <svg-icon
+              name="stamp-full.min"
+              class="mobile-stamp-full"
+              :width="104"
+            />
             <div class="mobile-info-title">{{ currentPhoto?.title }}</div>
+          </div>
+          <div class="mobile-info-desc-scroll">
             <div class="mobile-info-desc">{{ currentPhoto?.description }}</div>
           </div>
         </div>
@@ -199,14 +153,17 @@ import Modal from './modal.vue';
 import AlbumModalToolbar from './album-modal-toolbar.vue';
 import AlbumModalInfo from './album-modal-info.vue';
 import AlbumModalSlider from './album-modal-slider.vue';
+import AlbumExifPanel from './album-exif-panel.vue';
 import fullScreenViewer from './full-screen-viewer.vue';
 import { ref, watch, watchEffect } from 'vue';
 import { getAlbumById } from '@/request';
 import { AlbumRes } from '@/typings';
 import { useScrollOffset } from '@/composables/useScrollOffset';
 import { useSwipe } from '@vueuse/core';
-import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
-import { ExclamationCircleIcon, ViewfinderCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
+import {
+  ExclamationCircleIcon,
+  XMarkIcon,
+} from '@heroicons/vue/24/outline';
 import MobileModalWrapper from './mobile-modal-wrapper.vue';
 
 const store = useAppStore();
@@ -224,6 +181,7 @@ const isImageLoading = ref(true);
 // 移动端展开状态
 const isExpanded = ref(false);
 const currentSlideIndexMobile = ref(0);
+const showMobileExif = ref(false);
 
 // peek 栏 / info panel 的 swipe ref
 const peekRef = ref<HTMLElement | null>(null);
@@ -255,10 +213,19 @@ const handleImageLoadingState = (loadingState: boolean) => {
 
 const handleSlideChange = (photo: AlbumRes['photos'][0]) => {
   currentPhoto.value = photo;
+  showMobileExif.value = false;
   const idx = albumDetail.value?.photos?.findIndex(p => p.id === photo.id);
   if (idx !== undefined && idx >= 0) {
     currentSlideIndexMobile.value = idx;
   }
+};
+
+const closeMobileExif = () => {
+  showMobileExif.value = false;
+};
+
+const toggleMobileExif = () => {
+  showMobileExif.value = !showMobileExif.value;
 };
 
 const fetchAlbumDetail = async (id: string) => {
@@ -289,6 +256,7 @@ watchEffect(() => {
     fetchAlbumDetail(currentAlbumItem.value.id);
     currentSlideIndexMobile.value = 0;
     isExpanded.value = false;
+    showMobileExif.value = false;
     currentPhoto.value = null;
   }
 });
@@ -302,6 +270,7 @@ watch(albumDetail, (detail) => {
 
 const handleCloseModal = () => {
   isExpanded.value = false;
+  showMobileExif.value = false;
   closeAlbumModal();
 };
 
@@ -348,6 +317,7 @@ const handleFullScreenClick = () => {
 @safe-area-bottom: env(safe-area-inset-bottom, 0px);
 
 .album-modal-mobile {
+  --mobile-info-panel-height: 0px;
   position: relative;
   width: 100%;
   height: 100%;
@@ -357,17 +327,11 @@ const handleFullScreenClick = () => {
 }
 
 .mobile-photo-area {
-  flex-grow: 1;
+  width: 100%;
+  height: calc(100% - var(--mobile-info-panel-height));
   position: relative;
-  transition: min-height 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: height 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   background: #212121;
-
-  &.expanded {
-    flex-grow: 0;
-    flex-shrink: 0;
-    min-height: max(200px, 28vh);
-    max-height: max(200px, 28vh);
-  }
 }
 
 .mobile-top-bar {
@@ -381,12 +345,19 @@ const handleFullScreenClick = () => {
   justify-content: space-between;
 }
 
+.mobile-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .mobile-top-location {
   font-size: 11px;
   color: rgba(255, 255, 255, 0.85);
   letter-spacing: 0.5px;
 }
 
+.mobile-info-btn,
 .mobile-close-btn {
   width: 28px;
   height: 28px;
@@ -398,6 +369,19 @@ const handleFullScreenClick = () => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+
+.mobile-exif-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 11;
+}
+
+.mobile-exif-popover {
+  position: absolute;
+  top: 58px;
+  left: 14px;
+  right: 14px;
 }
 
 .mobile-progress-bar {
@@ -418,53 +402,27 @@ const handleFullScreenClick = () => {
   min-width: 6px;
 
   &.viewed {
-    background: rgba(255, 255, 255, 1);
+    background: rgba(255, 255, 255, 0.72);
   }
 
   &.current {
-    background: rgba(255, 255, 255, 0.65);
+    background: rgba(255, 255, 255, 0.72);
   }
 }
 
-.mobile-exif-popover-wrapper {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 10;
-}
-
-.mobile-exif-btn {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.mobile-exif-panel {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 8px);
-  width: min(320px, 90vw);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-  z-index: 20;
-}
-
 .mobile-peek-strip {
-  flex-shrink: 0;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 12;
   height: calc(60px + @safe-area-bottom);
   padding-bottom: @safe-area-bottom;
   background: rgba(245, 243, 240, 0.95);
-  backdrop-filter: blur(16px);
+  backdrop-filter: blur(24px) saturate(135%);
+  -webkit-backdrop-filter: blur(24px) saturate(135%);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 -8px 32px rgba(28, 28, 28, 0.12);
   border-radius: 14px 14px 0 0;
   display: flex;
   flex-direction: column;
@@ -488,7 +446,6 @@ const handleFullScreenClick = () => {
   padding: 0 16px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   box-sizing: border-box;
 }
 
@@ -503,71 +460,57 @@ const handleFullScreenClick = () => {
   margin-right: 12px;
 }
 
-.peek-exif-wrapper {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.peek-exif-btn {
-  background: rgba(0, 0, 0, 0.07);
-  color: #121315;
-}
-
 .mobile-info-panel {
-  flex-shrink: 0;
-  flex-grow: 1;
-  background: rgba(245, 243, 240, 0.98);
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 12;
+  height: var(--mobile-info-panel-height);
+  background: rgba(245, 243, 240, 0.95);
+  backdrop-filter: blur(24px) saturate(135%);
+  -webkit-backdrop-filter: blur(24px) saturate(135%);
+  border-top: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: 0 -8px 32px rgba(28, 28, 28, 0.12);
   border-radius: 14px 14px 0 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   padding-top: 16px;
   align-items: center;
+  box-sizing: border-box;
 }
 
 .mobile-info-scroll {
   width: 100%;
-  overflow-y: auto;
-  padding: 16px 24px calc(24px + @safe-area-bottom);
+  flex-shrink: 0;
+  position: relative;
+  padding: 16px 24px 0;
   box-sizing: border-box;
 }
 
-.mobile-stamp-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
+.mobile-info-desc-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  padding: 0 24px calc(24px + @safe-area-bottom);
+  box-sizing: border-box;
 }
 
-.mobile-stamp-circle {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  border: 2px solid #c0392b;
-  flex-shrink: 0;
-}
-
-.mobile-stamp-from {
-  font-size: 12px;
-  color: #618a54;
-  font-weight: bold;
-}
-
-.mobile-stamp-city {
-  font-size: 14px;
-  font-weight: bold;
-  color: #2b4e20;
-  margin-top: 2px;
-}
-
-.mobile-stamp-sub {
-  font-size: 13px;
-  font-weight: bold;
-  color: #2b4e20;
-  margin-top: 2px;
+.mobile-stamp-full {
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  opacity: 0.85;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .mobile-info-title {
+  position: relative;
+  z-index: 1;
+  padding-right: 72px;
   font-size: 16px;
   font-weight: bold;
   text-decoration: underline;
@@ -585,13 +528,24 @@ const handleFullScreenClick = () => {
   color: #333;
 }
 
+.mobile-exif-fade-enter-active,
+.mobile-exif-fade-leave-active {
+  transition: opacity 0.18s ease;
+}
+
+.mobile-exif-fade-enter-from,
+.mobile-exif-fade-leave-to {
+  opacity: 0;
+}
+
 .info-slide-enter-active,
 .info-slide-leave-active {
-  transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+  transition: opacity 0.2s ease, transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
 .info-slide-enter-from,
 .info-slide-leave-to {
+  opacity: 0;
   transform: translateY(100%);
 }
 </style>

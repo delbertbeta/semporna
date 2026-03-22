@@ -26,6 +26,10 @@
 <script setup lang="ts">
 import LoadingPlaceholder from './loading-placeholder.vue';
 import { computed, ref } from 'vue';
+import {
+  getInitialModalEntered,
+  getRealModalLoading,
+} from '@/utils/modal-loading';
 
 const props = defineProps<{
   visible: boolean;
@@ -36,9 +40,12 @@ defineEmits<{
   close: [];
 }>();
 
-const entered = ref(false);
+const entered = ref(getInitialModalEntered(props.visible));
 
-const realLoading = computed(() => !entered.value || props.loading);
+const realLoading = computed(() => getRealModalLoading({
+  entered: entered.value,
+  loading: props.loading,
+}));
 
 const handleAfterEnter = () => {
   entered.value = true;

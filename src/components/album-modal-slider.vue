@@ -2,8 +2,11 @@
   <div class="album-modal-slider-container absolute w-full h-full">
     <swiper
       class="album-modal-slider w-full h-full"
+      :modules="modules"
+      :zoom="zoomOptions"
       :space-between="0"
       @swiper="handleSwiper"
+      @zoomChange="handleZoomChange"
       :speed="720"
       :simulate-touch="isMobile"
       loop
@@ -16,14 +19,16 @@
             :loading="!imageLoadedState[photo.id!]"
             theme="black"
           />
-          <img
-            v-show="imageLoadedState[photo.id!]"
-            @load="imageLoadedState[photo.id!] = true"
-            :id="`image-id-${photo.id}`"
-            class="album-modal-img max-h-full max-w-full h-full w-full"
-            :class="props.cover ? 'object-cover' : 'object-contain'"
-            :src="matchImageUrl(photo.image, 'higher', '1080p')"
-          />
+          <div class="swiper-zoom-container">
+            <img
+              v-show="imageLoadedState[photo.id!]"
+              @load="imageLoadedState[photo.id!] = true"
+              :id="`image-id-${photo.id}`"
+              class="album-modal-img max-h-full max-w-full h-full w-full"
+              :class="props.cover ? 'object-cover' : 'object-contain'"
+              :src="matchImageUrl(photo.image, 'higher', '1080p')"
+            />
+          </div>
         </div>
       </swiper-slide>
     </swiper>
@@ -47,7 +52,9 @@
 <script setup lang="ts">
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Swiper as SwiperInner } from 'swiper';
+import { Zoom } from 'swiper/modules';
 import 'swiper/css';
+import 'swiper/css/zoom';
 import LoadingPlaceholder from './loading-placeholder.vue';
 
 import { ref, watchEffect, computed, watch } from 'vue';
@@ -67,10 +74,45 @@ const props = defineProps<{
   cover?: boolean;
 }>();
 
+const modules = [Zoom];
 const swiperRef = ref<SwiperInner>();
 const currentSlideIndex = ref(0);
+const currentZoomScale = ref(1);
 
 const imageLoadedState = ref<Record<number, boolean>>({});
+
+const zoomOptions = computed(() => (
+  isMobile.value
+    ? {
+      maxRatio: 4,
+      minRatio: 1,
+      toggle: true,
+    }
+    : false
+));
+
+const canResetZoom = (swiper: SwiperInner) => {
+  const activeSlide = swiper.slides?.[swiper.activeIndex] as HTMLElement | undefined;
+  if (!activeSlide) {
+    return false;
+  }
+
+  const zoomContainerClass = swiper.params.zoom?.containerClass || 'swiper-zoom-container';
+  return Boolean(activeSlide.querySelector(`.${zoomContainerClass}`));
+};
+
+const resetZoomState = (swiper: SwiperInner) => {
+  swiper.allowTouchMove = true;
+  currentZoomScale.value = 1;
+
+  if (!isMobile.value || swiper.zoom.scale <= 1.01) {
+    return;
+  }
+
+  if (canResetZoom(swiper)) {
+    swiper.zoom.out();
+  }
+};
 
 const isCurrentImageLoading = computed(() => {
   const photos = props.album?.photos || [];
@@ -105,6 +147,7 @@ watchEffect(() => {
 const handleSwiper = (swiper: SwiperInner) => {
   swiperRef.value = swiper;
   swiper.on('slideChange', () => {
+    resetZoomState(swiper);
     const currentIndex = swiper.realIndex;
     currentSlideIndex.value = Number.isNaN(currentIndex) ? 0 : currentIndex;
     const photos = props.album?.photos || [];
@@ -114,6 +157,13 @@ const handleSwiper = (swiper: SwiperInner) => {
   });
 };
 
+const handleZoomChange = (_swiper: SwiperInner, scale: number) => {
+  currentZoomScale.value = scale;
+  if (swiperRef.value) {
+    swiperRef.value.allowTouchMove = scale <= 1.01;
+  }
+};
+
 const slideNext = () => {
   swiperRef.value?.slideNext();
 };
@@ -121,10 +171,28 @@ const slideNext = () => {
 const slidePrev = () => {
   swiperRef.value?.slidePrev();
 };
+
+watch(
+  () => props.album?.id,
+  () => {
+    if (swiperRef.value) {
+      resetZoomState(swiperRef.value);
+    }
+  }
+);
 </script>
 
 <style lang="less" scoped>
 @import '../assets/less/variant.less';
+
+.album-modal-slider-item {
+  overflow: hidden;
+}
+
+.swiper-zoom-container {
+  width: 100%;
+  height: 100%;
+}
 
 .album-modal-slider-container:hover {
   .left-arrow,
@@ -165,6 +233,10 @@ const slidePrev = () => {
   .left-arrow,
   .right-arrow {
     display: none;
+  }
+
+  .album-modal-slider-container :deep(.swiper-slide-zoomed) {
+    cursor: grab;
   }
 }
 </style>

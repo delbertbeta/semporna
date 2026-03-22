@@ -229,12 +229,12 @@ onUnmounted(() => {
   }
 }
 
-  .swiper-slide-active {
-    .info-tag {
-      opacity: 1;
-      transform: translateY(0px);
-    }
+.swiper-slide-active {
+  .info-tag {
+    opacity: 1;
+    transform: translateY(0px);
   }
+}
 
 .info-tag {
   position: absolute;
@@ -245,9 +245,9 @@ onUnmounted(() => {
   transform: translateY(20px);
   pointer-events: none;
 
-    transition:
-      opacity 0.42s ease-in-out 0.3s,
-      transform 0.42s ease-in-out 0.3s;
+  transition:
+    opacity 0.42s ease-in-out 0.3s,
+    transform 0.42s ease-in-out 0.3s;
 
   .into-year {
     font-size: 96px;
@@ -408,7 +408,9 @@ onUnmounted(() => {
       transform 420ms cubic-bezier(0.32, 0.72, 0, 1);
   }
 
-  .is-mobile-banner-transitioning .full-screen-banner-slider-item > .full-screen-banner-img {
+  .is-mobile-banner-transitioning
+    .full-screen-banner-slider-item
+    > .full-screen-banner-img {
     border-radius: 64px;
     transform: scale(0.8);
   }
@@ -461,7 +463,11 @@ onUnmounted(() => {
     background: rgba(18, 19, 21, 0.26);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
-    mask-image: linear-gradient(to top, rgba(0, 0, 0, 1) 55%, rgba(0, 0, 0, 0) 100%);
+    mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 55%,
+      rgba(0, 0, 0, 0) 100%
+    );
     -webkit-mask-image: linear-gradient(
       to top,
       rgba(0, 0, 0, 1) 55%,
@@ -514,6 +520,5 @@ onUnmounted(() => {
     color: rgba(255, 255, 255, 0.86);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   }
-
 }
 </style>

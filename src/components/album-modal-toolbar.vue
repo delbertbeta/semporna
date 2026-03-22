@@ -21,42 +21,7 @@
         <PopoverPanel
           class="absolute left-1/2 z-10 mt-3 -translate-x-[85%] p-3 w-80 rounded-lg bg-white-transparent-2 backdrop-blur-sm"
         >
-          <div class="rounded-md bg-white w-full overflow-hidden">
-            <div
-              class="text-text-main bg-green-transparent-1 h-7 px-3 font-bold w-full leading-7"
-            >
-              {{
-                photo?.image.exif.dateTime
-                  ? new Date(photo.image.exif.dateTime).toLocaleString()
-                  : '未知拍摄时间'
-              }}
-            </div>
-            <div class="flex flex-row items-start py-2 px-3">
-              <ViewfinderCircleIcon class="size-4 mt-0.5" />
-              <div class="flex flex-col font-medium ms-2 text-sm">
-                <div>{{ photo?.image.exif.model || '未知相机' }}</div>
-                <div>{{ photo?.image.exif.lens || '未知镜头' }}</div>
-              </div>
-            </div>
-            <div class="bg-divider h-px mx-3" />
-            <div class="flex font-medium mt-1 mb-2 mx-3 text-sm">
-              <div class="photo-params-item after:bg-divider">
-                {{ photo?.image.exif.fNumber || 'ƒ -' }}
-              </div>
-              <div class="photo-params-item after:bg-divider">
-                {{ photo?.image.exif.focalLength || '- mm' }}
-              </div>
-              <div class="photo-params-item after:bg-divider">
-                {{ photo?.image.exif.iso || 'ISO -' }}
-              </div>
-              <div class="photo-params-item after:bg-divider">
-                {{ photo?.image.exif.ev || '- ev' }}
-              </div>
-              <div class="photo-params-item after:bg-divider">
-                {{ photo?.image.exif.exposureTime || '- s' }}
-              </div>
-            </div>
-          </div>
+          <album-exif-panel :photo="photo" />
         </PopoverPanel>
       </transition>
     </Popover>
@@ -72,10 +37,9 @@ import { Popover, PopoverButton, PopoverPanel } from '@headlessui/vue';
 import {
   ArrowsPointingOutIcon,
   ExclamationCircleIcon,
-  HeartIcon,
-  ViewfinderCircleIcon,
 } from '@heroicons/vue/24/outline';
 import { AlbumRes } from '@/typings';
+import AlbumExifPanel from './album-exif-panel.vue';
 
 defineProps<{
   photo?: AlbumRes['photos'][0] | null;
@@ -120,27 +84,4 @@ const emit = defineEmits<{
   }
 }
 
-.photo-params-item {
-  flex-grow: 1;
-  text-align: center;
-  position: relative;
-
-  &:first-of-type {
-    text-align: left;
-  }
-
-  &:not(:last-of-type)::after {
-    content: '';
-    position: absolute;
-    height: 70%;
-    width: 1px;
-    right: 0;
-    top: 15%;
-    opacity: 0.6;
-  }
-
-  &:last-of-type {
-    text-align: right;
-  }
-}
 </style>
