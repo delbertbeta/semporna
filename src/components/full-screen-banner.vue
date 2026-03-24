@@ -82,7 +82,7 @@ const appStore = useAppStore();
 const { isAnyModalOpen } = storeToRefs(appStore);
 const { isMobile } = useScrollOffset();
 const { albums } = storeToRefs(albumStore);
-const modules = [Autoplay];
+// const modules = [Autoplay];
 const swiperRef = ref<SwiperInner>();
 const progressBar = ref<HTMLDivElement>();
 const isBannerTransitioning = ref(false);
@@ -238,7 +238,7 @@ onUnmounted(() => {
 
 .info-tag {
   position: absolute;
-  top: -64px;
+  top: -74px;
   left: 32px;
   z-index: 2;
   opacity: 0;
@@ -252,34 +252,36 @@ onUnmounted(() => {
   .into-year {
     font-size: 96px;
     font-weight: lighter;
-    text-shadow: 0 0 8px rgba(255, 255, 255, 0.18);
   }
 
   .into-location {
-    display: none;
-  }
-
-  .into-bar {
-    margin-top: 8px;
+    display: block;
     font-size: 18px;
-  }
-
-  .into-pos {
-    padding: 4px 12px;
-    display: inline-block;
-    background-color: @ui-color-secondary;
-    color: white;
-  }
-
-  .info-des {
-    padding: 4px 12px;
-    background-color: white;
-    display: inline-block;
+    font-weight: 500;
+    margin-inline-start: 8px;
+    margin-top: -16px;
   }
 }
 
 .info-tag-backdrop {
-  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 138px;
+  z-index: 1;
+  opacity: 1;
+  border-radius: 4px 4px 0 0;
+  background: rgba(255, 255, 255, 0.5);
+  mix-blend-mode: hard-light;
+  backdrop-filter: blur(18px);
+  mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1) 0%,
+    rgba(0, 0, 0, 0.72) 20%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
 }
 
 .scroll-down {
@@ -453,17 +455,20 @@ onUnmounted(() => {
   .info-tag-backdrop {
     display: block;
     position: absolute;
+    top: unset;
     left: 0;
     right: 0;
     bottom: 0;
     height: 112px;
     z-index: 1;
     opacity: 0;
+    border-radius: 0;
     transform: scaleY(0.5);
     transform-origin: bottom center;
     background: rgba(18, 19, 21, 0.26);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
+    mix-blend-mode: initial;
     mask-image: linear-gradient(
       to top,
       rgba(0, 0, 0, 1) 55%,
@@ -518,6 +523,8 @@ onUnmounted(() => {
     font-size: 12px;
     font-weight: 500;
     line-height: 1.25;
+    margin-inline-start: 4px;
+    margin-top: 0;
     color: rgba(255, 255, 255, 0.86);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
   }

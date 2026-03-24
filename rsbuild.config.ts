@@ -4,8 +4,11 @@ import { defineConfig } from '@rsbuild/core';
 import { pluginVue } from '@rsbuild/plugin-vue';
 import { pluginLess } from '@rsbuild/plugin-less';
 import dotenv from 'dotenv';
+import { resolveApiEndpoint } from './config/api-endpoint';
 
 dotenv.config();
+
+const apiEndpoint = resolveApiEndpoint(process.env.APP_ENV);
 
 export default defineConfig({
   html: {
@@ -16,7 +19,7 @@ export default defineConfig({
       index: './src/main.ts',
     },
     define: {
-      API_END_POINT: JSON.stringify(process.env.API_END_POINT),
+      API_END_POINT: JSON.stringify(apiEndpoint),
     },
   },
   tools: {

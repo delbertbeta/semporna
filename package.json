@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "build": "rsbuild build",
-    "start": "rsbuild dev",
+    "build": "APP_ENV=prod rsbuild build",
+    "build:staging": "APP_ENV=staging rsbuild build",
+    "start": "APP_ENV=dev rsbuild dev",
     "lint": "eslint --fix"
   },
   "husky": {

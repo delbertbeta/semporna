@@ -4,8 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- `npm start` - Start development server (runs on port 3001 by default, configurable via LISTEN_PORT env var)
-- `npm run build` - Build for production using Rsbuild
+- `npm start` - Start development server with the dev API domain (runs on port 3001 by default, configurable via LISTEN_PORT env var)
+- `npm run build` - Build for production using the prod API domain
+- `npm run build:staging` - Build for staging using the staging API domain
 - `npm run lint` - Run ESLint with auto-fix
 - Pre-commit hooks automatically run lint-staged for TypeScript, JavaScript, and Vue files
 
@@ -52,7 +53,8 @@ This is a Vue 3 photo gallery application called "Semporna" built with the follo
 #### Configuration
 
 - `rsbuild.config.ts` - Build configuration with custom SVG sprite loader setup
-- Environment variables: `API_END_POINT`, `LISTEN_PORT`, `HMR_PORT`
+- `config/api-endpoint.ts` - API domain mapping for `dev`, `staging`, and `prod`
+- Environment variables: `APP_ENV`, `LISTEN_PORT`, `HMR_PORT`
 
 ### Data Flow
 
