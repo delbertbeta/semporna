@@ -19,7 +19,7 @@
         leave-to-class="translate-y-1 opacity-0"
       >
         <PopoverPanel
-          class="absolute left-1/2 z-10 mt-3 -translate-x-[85%] p-3 w-80 rounded-lg bg-white-transparent-2 backdrop-blur-sm"
+          class="absolute left-1/2 z-10 mt-3 -translate-x-[87%] w-80"
         >
           <album-exif-panel :photo="photo" />
         </PopoverPanel>
@@ -83,5 +83,4 @@ const emit = defineEmits<{
     background-color: rgba(255, 255, 255, 0.9);
   }
 }
-
 </style>
