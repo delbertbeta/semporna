@@ -6,7 +6,6 @@
     <swiper
       class="album-modal-slider w-full h-full"
       :modules="modules"
-      :virtual="virtualWindowConfig"
       :zoom="zoomOptions"
       :space-between="0"
       @swiper="handleSwiper"
@@ -15,11 +14,7 @@
       :simulate-touch="isMobile"
       loop
     >
-      <swiper-slide
-        v-for="(photo, index) in album?.photos || []"
-        :key="photo.id"
-        :virtualIndex="index"
-      >
+      <swiper-slide v-for="photo in album?.photos || []" :key="photo.id">
         <div
           class="album-modal-slider-item flex items-center justify-center w-full h-full"
         >
@@ -60,16 +55,14 @@
 <script setup lang="ts">
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Swiper as SwiperInner } from 'swiper';
-import { Virtual, Zoom } from 'swiper/modules';
+import { Zoom } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/zoom';
-import 'swiper/css/virtual';
 import LoadingPlaceholder from './loading-placeholder.vue';
 
 import { ref, watchEffect, computed, watch } from 'vue';
 import { AlbumRes } from '@/typings';
 import { useScrollOffset } from '@/composables/useScrollOffset';
-import { getVirtualWindowConfig } from '@/utils/swiper-virtual';
 
 const { isMobile } = useScrollOffset();
 
@@ -84,13 +77,12 @@ const props = defineProps<{
   cover?: boolean;
 }>();
 
-const modules = [Virtual, Zoom];
+const modules = [Zoom];
 const swiperRef = ref<SwiperInner>();
 const currentSlideIndex = ref(0);
 const currentZoomScale = ref(1);
 
 const imageLoadedState = ref<Record<number, boolean>>({});
-const virtualWindowConfig = getVirtualWindowConfig(4);
 
 const zoomOptions = computed(() => (
   isMobile.value

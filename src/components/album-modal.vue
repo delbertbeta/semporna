@@ -172,9 +172,11 @@ import { useSwipe } from '@vueuse/core';
 import { useRoute } from 'vue-router';
 import { ExclamationCircleIcon, XMarkIcon } from '@heroicons/vue/24/outline';
 import MobileModalWrapper from './mobile-modal-wrapper.vue';
+import { useThemeColor } from '@/composables/useThemeColor';
 import {
   ALBUM_ROUTE_NAME,
 } from '@/utils/album-route';
+import { ALBUM_MODAL_THEME_COLOR } from '@/utils/browser-theme';
 
 const store = useAppStore();
 const { closeAlbumModal } = store;
@@ -203,6 +205,11 @@ const isMobilePhotoZoomed = ref(false);
 // peek 栏 / info panel 的 swipe ref
 const peekRef = ref<HTMLElement | null>(null);
 const infoPanelRef = ref<HTMLElement | null>(null);
+
+useThemeColor(
+  ALBUM_MODAL_THEME_COLOR,
+  computed(() => showAlbumModal.value)
+);
 
 // 向上滑动 peek 栏 → 展开
 const { direction: peekSwipeDir } = useSwipe(peekRef, {
@@ -384,6 +391,7 @@ const handleFullScreenClick = () => {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  background: #212121;
 }
 
 .mobile-photo-area {

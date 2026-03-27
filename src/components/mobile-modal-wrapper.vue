@@ -130,6 +130,8 @@ onUnmounted(() => {
   background: #212121;
   overflow: hidden;
   overscroll-behavior: contain;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
 }
 
 .mobile-modal-enter-active {
