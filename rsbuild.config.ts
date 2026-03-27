@@ -12,7 +12,11 @@ const apiEndpoint = resolveApiEndpoint(process.env.APP_ENV);
 
 export default defineConfig({
   html: {
-    title: 'Semporna',
+    title: 'The Place of Shyrii & Delbert',
+    favicon: './src/assets/img/logo.png',
+    meta: {
+      description: '把平凡的日子，记录成不舍得删的样子。',
+    },
   },
   source: {
     entry: {

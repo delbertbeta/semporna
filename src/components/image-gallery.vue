@@ -16,9 +16,13 @@ import { useAlbumStore } from '@/store/album';
 import { throttle } from 'lodash-es';
 import { useScrollOffset } from '@/composables/useScrollOffset';
 import MobileMonthTabs from './mobile-month-tabs.vue';
+import { useThemeColor } from '@/composables/useThemeColor';
+import { HOME_THEME_COLOR } from '@/utils/browser-theme';
 
 const store = useAlbumStore();
 const { isMobile, scrollOffset } = useScrollOffset();
+
+useThemeColor(HOME_THEME_COLOR);
 
 const handleScroll = throttle(() => {
   const imageItems = document.querySelectorAll(
