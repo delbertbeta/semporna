@@ -4,6 +4,7 @@
     :class="{ 'mobile-zoom-active': isMobile && currentZoomScale > 1.01 }"
   >
     <swiper
+      v-if="hasPhotos"
       class="album-modal-slider w-full h-full"
       :modules="modules"
       :zoom="zoomOptions"
@@ -12,7 +13,7 @@
       @zoomChange="handleZoomChange"
       :speed="720"
       :simulate-touch="isMobile"
-      loop
+      :loop="hasMultiplePhotos"
     >
       <swiper-slide v-for="photo in album?.photos || []" :key="photo.id">
         <div
@@ -83,6 +84,9 @@ const currentSlideIndex = ref(0);
 const currentZoomScale = ref(1);
 
 const imageLoadedState = ref<Record<number, boolean>>({});
+
+const hasPhotos = computed(() => Boolean(props.album?.photos?.length));
+const hasMultiplePhotos = computed(() => (props.album?.photos?.length || 0) > 1);
 
 const zoomOptions = computed(() => (
   isMobile.value
@@ -184,6 +188,7 @@ watch(
       resetZoomState(swiperRef.value);
     }
 
+    swiperRef.value = undefined;
     currentSlideIndex.value = 0;
   }
 );

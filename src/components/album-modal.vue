@@ -20,6 +20,8 @@
       <!-- 照片 Swiper（始终全屏，cover 模式） -->
       <div class="mobile-photo-area">
         <album-modal-slider
+          v-if="albumDetail?.photos?.length"
+          :key="albumSliderKey"
           :album="albumDetail"
           :cover="false"
           @slideChange="handleSlideChange"
@@ -143,6 +145,8 @@
           @full-screen-click="handleFullScreenClick"
         />
         <album-modal-slider
+          v-if="albumDetail?.photos?.length"
+          :key="albumSliderKey"
           :album="albumDetail"
           @slideChange="handleSlideChange"
           @image-loading-state="handleImageLoadingState"
@@ -177,6 +181,7 @@ import {
   ALBUM_ROUTE_NAME,
 } from '@/utils/album-route';
 import { ALBUM_MODAL_THEME_COLOR } from '@/utils/browser-theme';
+import { getAlbumSliderKey } from '@/utils/album-slider';
 
 const store = useAppStore();
 const { closeAlbumModal } = store;
@@ -195,6 +200,7 @@ const albumDetail = ref<AlbumRes | null>(null);
 const currentPhoto = ref<AlbumRes['photos'][0] | null>(null);
 const isImageLoading = ref(true);
 const activeAlbumRequestId = ref<string | null>(null);
+const albumSliderKey = computed(() => getAlbumSliderKey(albumDetail.value));
 
 // 移动端展开状态
 const isExpanded = ref(false);
