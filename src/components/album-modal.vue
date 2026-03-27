@@ -535,7 +535,8 @@ const handleFullScreenClick = () => {
   right: 0;
   bottom: 0;
   z-index: 12;
-  height: var(--mobile-info-panel-height);
+  height: calc(var(--mobile-info-panel-height) + @safe-area-bottom);
+  padding-bottom: @safe-area-bottom;
   background: rgba(245, 243, 240, 0.85);
   backdrop-filter: blur(24px) saturate(135%);
   -webkit-backdrop-filter: blur(24px) saturate(135%);
@@ -569,7 +570,7 @@ const handleFullScreenClick = () => {
   min-height: 0;
   width: 100%;
   overflow-y: auto;
-  padding: 0 24px calc(24px + @safe-area-bottom);
+  padding: 0 24px 24px;
   box-sizing: border-box;
 }
 

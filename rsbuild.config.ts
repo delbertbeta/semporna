@@ -16,6 +16,8 @@ export default defineConfig({
     favicon: './src/assets/img/logo.png',
     meta: {
       description: '把平凡的日子，记录成不舍得删的样子。',
+      'theme-color': '#f5f3f0',
+      viewport: 'width=device-width, initial-scale=1, viewport-fit=cover',
     },
   },
   source: {

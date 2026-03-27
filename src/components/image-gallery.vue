@@ -80,6 +80,8 @@ onUnmounted(() => {
 </script>
 
 <style lang="less">
+@safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
 .scroll-wrapper {
   width: 100%;
   height: 100%;
@@ -106,6 +108,8 @@ onUnmounted(() => {
   .scroll-wrapper {
     height: auto;
     overflow-y: unset;
+    padding-bottom: @safe-area-bottom;
+    box-sizing: border-box;
   }
 }
 </style>

@@ -197,6 +197,8 @@ onUnmounted(() => {
 <style lang="less" scoped>
 @import '../assets/less/variant.less';
 
+@safe-area-bottom: env(safe-area-inset-bottom, 0px);
+
 .full-screen-banner {
   height: 100%;
   width: 100%;
@@ -420,7 +422,7 @@ onUnmounted(() => {
 
   .autoplay-progress {
     top: unset;
-    bottom: 8px;
+    bottom: calc(8px + @safe-area-bottom);
     right: 50%;
     transform: translateX(50%);
   }
@@ -428,7 +430,7 @@ onUnmounted(() => {
   // 将日期标签移到 Banner 底部左侧
   .swiper-slide-active .info-tag {
     top: unset;
-    bottom: 0;
+    bottom: @safe-area-bottom;
     left: 0;
     right: 0;
     opacity: 1;
@@ -438,7 +440,7 @@ onUnmounted(() => {
 
   .info-tag {
     top: unset;
-    bottom: 0;
+    bottom: @safe-area-bottom;
     left: 0;
     right: 0;
     padding: 24px 16px 22px;
@@ -459,7 +461,7 @@ onUnmounted(() => {
     left: 0;
     right: 0;
     bottom: 0;
-    height: 112px;
+    height: calc(112px + @safe-area-bottom);
     z-index: 1;
     opacity: 0;
     border-radius: 0;
