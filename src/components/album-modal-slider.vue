@@ -6,6 +6,7 @@
     <swiper
       class="album-modal-slider w-full h-full"
       :modules="modules"
+      :virtual="virtualWindowConfig"
       :zoom="zoomOptions"
       :space-between="0"
       @swiper="handleSwiper"
@@ -14,7 +15,11 @@
       :simulate-touch="isMobile"
       loop
     >
-      <swiper-slide v-for="photo in album?.photos || []" :key="photo.id">
+      <swiper-slide
+        v-for="(photo, index) in album?.photos || []"
+        :key="photo.id"
+        :virtualIndex="index"
+      >
         <div
           class="album-modal-slider-item flex items-center justify-center w-full h-full"
         >
@@ -29,7 +34,7 @@
               :id="`image-id-${photo.id}`"
               class="album-modal-img max-h-full max-w-full h-full w-full"
               :class="props.cover ? 'object-cover' : 'object-contain'"
-              :src="matchImageUrl(photo.image, 'higher', '1080p')"
+              :src="photo.image.objectPath"
             />
           </div>
         </div>
@@ -55,15 +60,16 @@
 <script setup lang="ts">
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import { Swiper as SwiperInner } from 'swiper';
-import { Zoom } from 'swiper/modules';
+import { Virtual, Zoom } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/zoom';
+import 'swiper/css/virtual';
 import LoadingPlaceholder from './loading-placeholder.vue';
 
 import { ref, watchEffect, computed, watch } from 'vue';
 import { AlbumRes } from '@/typings';
-import { matchImageUrl } from '@/utils';
 import { useScrollOffset } from '@/composables/useScrollOffset';
+import { getVirtualWindowConfig } from '@/utils/swiper-virtual';
 
 const { isMobile } = useScrollOffset();
 
@@ -78,12 +84,13 @@ const props = defineProps<{
   cover?: boolean;
 }>();
 
-const modules = [Zoom];
+const modules = [Virtual, Zoom];
 const swiperRef = ref<SwiperInner>();
 const currentSlideIndex = ref(0);
 const currentZoomScale = ref(1);
 
 const imageLoadedState = ref<Record<number, boolean>>({});
+const virtualWindowConfig = getVirtualWindowConfig(4);
 
 const zoomOptions = computed(() => (
   isMobile.value

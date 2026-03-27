@@ -7,7 +7,7 @@
     :data-year="new Date(item.date).getFullYear()"
     :data-month="new Date(item.date).getMonth() + 1"
   >
-    <img class="image" :src="matchImageUrl(item.poster, 'higher', '720p')" />
+    <img class="image" :src="item.poster.objectPath" />
     <Transition>
       <image-item-hover-meta v-if="hover" :item="item" />
     </Transition>
@@ -15,26 +15,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import ImageItemHoverMeta from './image-item-hover-meta.vue';
 import { useAppStore } from '@/store';
 import { AlbumMeta } from '@/typings';
-import { matchImageUrl } from '@/utils';
+import { useScrollOffset } from '@/composables/useScrollOffset';
+import { shouldEnableImageItemHover } from '@/utils/image-item-hover';
 
 const props = defineProps<{ item: AlbumMeta }>();
 
 const store = useAppStore();
 const { openAlbumModal } = store;
+const { isMobile } = useScrollOffset();
 
 const hover = ref(false);
 
 const handleMouseEnter = () => {
+  if (!shouldEnableImageItemHover(isMobile.value)) {
+    return;
+  }
   hover.value = true;
 };
 
 const handleMouseLeave = () => {
   hover.value = false;
 };
+
+watch(isMobile, (mobile) => {
+  if (mobile) {
+    hover.value = false;
+  }
+});
 
 const handleItemClick = () => {
   void openAlbumModal(props.item);
