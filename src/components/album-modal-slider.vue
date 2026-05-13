@@ -15,7 +15,10 @@
       :simulate-touch="isMobile"
       :loop="hasMultiplePhotos"
     >
-      <swiper-slide v-for="photo in album?.photos || []" :key="photo.id">
+      <swiper-slide
+        v-for="(photo, idx) in album?.photos || []"
+        :key="photo.id"
+      >
         <div
           class="album-modal-slider-item flex items-center justify-center w-full h-full"
         >
@@ -31,6 +34,15 @@
               class="album-modal-img max-h-full max-w-full h-full w-full"
               :class="props.cover ? 'object-cover' : 'object-contain'"
               :src="photo.image.objectPath"
+            />
+            <live-photo-preview
+              v-if="photo.image.livePhoto"
+              :photo="photo"
+              :active="idx === currentSlideIndex"
+              :muted="livePhotoMuted"
+              :autoplay="livePhotoAutoplay"
+              :play-signal="livePhotoPlaySignal"
+              :cover="props.cover"
             />
           </div>
         </div>
@@ -60,6 +72,7 @@ import { Zoom } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/zoom';
 import LoadingPlaceholder from './loading-placeholder.vue';
+import LivePhotoPreview from './live-photo-preview.vue';
 
 import { ref, watchEffect, computed, watch } from 'vue';
 import { AlbumRes } from '@/typings';
@@ -73,10 +86,17 @@ const emit = defineEmits<{
   (e: 'zoom-state-change', zoomed: boolean): void;
 }>();
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   album: AlbumRes | null;
   cover?: boolean;
-}>();
+  livePhotoMuted?: boolean;
+  livePhotoAutoplay?: boolean;
+  livePhotoPlaySignal?: number;
+}>(), {
+  livePhotoMuted: true,
+  livePhotoAutoplay: true,
+  livePhotoPlaySignal: 0,
+});
 
 const modules = [Zoom];
 const swiperRef = ref<SwiperInner>();

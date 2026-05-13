@@ -24,6 +24,9 @@
           :key="albumSliderKey"
           :album="albumDetail"
           :cover="false"
+          :live-photo-muted="livePhotoMuted"
+          :live-photo-autoplay="livePhotoAutoplay"
+          :live-photo-play-signal="livePhotoPlaySignal"
           @slideChange="handleSlideChange"
           @image-loading-state="handleImageLoadingState"
           @zoom-state-change="handleMobileZoomStateChange"
@@ -47,6 +50,14 @@
             </template>
           </span>
           <div class="mobile-top-actions">
+            <button
+              v-if="isCurrentPhotoLivePhoto"
+              class="mobile-live-photo-btn"
+              type="button"
+              @click.stop="handleLivePhotoReplay"
+            >
+              <svg-icon name="live-photo" :width="16" :height="16" />
+            </button>
             <button
               class="mobile-info-btn"
               type="button"
@@ -142,12 +153,20 @@
         <album-modal-toolbar
           v-show="!isImageLoading"
           :photo="currentPhoto"
+          :live-photo-muted="livePhotoMuted"
+          :live-photo-autoplay="livePhotoAutoplay"
           @full-screen-click="handleFullScreenClick"
+          @live-photo-replay="handleLivePhotoReplay"
+          @update:live-photo-muted="livePhotoMuted = $event"
+          @update:live-photo-autoplay="livePhotoAutoplay = $event"
         />
         <album-modal-slider
           v-if="albumDetail?.photos?.length"
           :key="albumSliderKey"
           :album="albumDetail"
+          :live-photo-muted="livePhotoMuted"
+          :live-photo-autoplay="livePhotoAutoplay"
+          :live-photo-play-signal="livePhotoPlaySignal"
           @slideChange="handleSlideChange"
           @image-loading-state="handleImageLoadingState"
         />
@@ -182,6 +201,7 @@ import {
 } from '@/utils/album-route';
 import { ALBUM_MODAL_THEME_COLOR } from '@/utils/browser-theme';
 import { getAlbumSliderKey } from '@/utils/album-slider';
+import { hasLivePhoto } from '@/utils/live-photo';
 
 const store = useAppStore();
 const { closeAlbumModal } = store;
@@ -201,6 +221,10 @@ const currentPhoto = ref<AlbumRes['photos'][0] | null>(null);
 const isImageLoading = ref(true);
 const activeAlbumRequestId = ref<string | null>(null);
 const albumSliderKey = computed(() => getAlbumSliderKey(albumDetail.value));
+const livePhotoMuted = ref(true);
+const livePhotoAutoplay = ref(true);
+const livePhotoPlaySignal = ref(0);
+const isCurrentPhotoLivePhoto = computed(() => hasLivePhoto(currentPhoto.value));
 
 // 移动端展开状态
 const isExpanded = ref(false);
@@ -358,6 +382,10 @@ const handleFullScreenClick = () => {
     `image-id-${currentPhoto.value?.id}`
   );
 };
+
+const handleLivePhotoReplay = () => {
+  livePhotoPlaySignal.value += 1;
+};
 </script>
 
 <style scoped lang="less">
@@ -432,6 +460,7 @@ const handleFullScreenClick = () => {
   letter-spacing: 0.5px;
 }
 
+.mobile-live-photo-btn,
 .mobile-info-btn,
 .mobile-close-btn {
   width: 28px;

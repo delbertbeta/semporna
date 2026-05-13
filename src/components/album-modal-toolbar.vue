@@ -1,5 +1,28 @@
 <template>
   <div class="toolbar-container">
+    <div v-if="isLivePhoto" class="live-photo-control">
+      <button class="button" type="button" @click="emit('livePhotoReplay')">
+        <svg-icon name="live-photo" :width="20" :height="20" />
+      </button>
+      <div class="live-photo-menu">
+        <label class="live-photo-menu-item">
+          <span>静音</span>
+          <input
+            type="checkbox"
+            :checked="livePhotoMuted"
+            @change="handleMutedChange"
+          />
+        </label>
+        <label class="live-photo-menu-item">
+          <span>自动播放</span>
+          <input
+            type="checkbox"
+            :checked="livePhotoAutoplay"
+            @change="handleAutoplayChange"
+          />
+        </label>
+      </div>
+    </div>
     <div class="button" @click="emit('fullScreenClick')">
       <ArrowsPointingOutIcon class="size-5" />
     </div>
@@ -40,14 +63,35 @@ import {
 } from '@heroicons/vue/24/outline';
 import { AlbumRes } from '@/typings';
 import AlbumExifPanel from './album-exif-panel.vue';
+import { computed } from 'vue';
+import { hasLivePhoto } from '@/utils/live-photo';
 
-defineProps<{
+const props = defineProps<{
   photo?: AlbumRes['photos'][0] | null;
+  livePhotoMuted: boolean;
+  livePhotoAutoplay: boolean;
 }>();
 
 const emit = defineEmits<{
   (e: 'fullScreenClick'): void;
+  (e: 'livePhotoReplay'): void;
+  (e: 'update:livePhotoMuted', value: boolean): void;
+  (e: 'update:livePhotoAutoplay', value: boolean): void;
 }>();
+
+const isLivePhoto = computed(() => hasLivePhoto(props.photo));
+
+const getChecked = (event: Event) => {
+  return (event.target as HTMLInputElement).checked;
+};
+
+const handleMutedChange = (event: Event) => {
+  emit('update:livePhotoMuted', getChecked(event));
+};
+
+const handleAutoplayChange = (event: Event) => {
+  emit('update:livePhotoAutoplay', getChecked(event));
+};
 </script>
 
 <style lang="less" scoped>
@@ -63,6 +107,7 @@ const emit = defineEmits<{
 }
 
 .button {
+  border: 0;
   padding: 6px;
   height: 32px;
   box-sizing: border-box;
@@ -81,6 +126,52 @@ const emit = defineEmits<{
   &:hover,
   &.active {
     background-color: rgba(255, 255, 255, 0.9);
+  }
+}
+
+.live-photo-control {
+  position: relative;
+
+  &:hover {
+    .live-photo-menu {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+  }
+}
+
+.live-photo-menu {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  width: 152px;
+  padding: 8px;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: all 0.16s ease-out;
+}
+
+.live-photo-menu-item {
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: @ui-color-divider;
+  font-size: 13px;
+  cursor: pointer;
+
+  input {
+    width: 16px;
+    height: 16px;
+    accent-color: @ui-color-divider;
+    cursor: pointer;
   }
 }
 </style>
