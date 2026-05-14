@@ -1,28 +1,30 @@
 <template>
   <div class="toolbar-container">
-    <div v-if="isLivePhoto" class="live-photo-control">
-      <button class="button" type="button" @click="emit('livePhotoReplay')">
-        <svg-icon name="live-photo" :width="20" :height="20" />
-      </button>
-      <div class="live-photo-menu">
-        <label class="live-photo-menu-item">
-          <span>静音</span>
-          <input
-            type="checkbox"
-            :checked="livePhotoMuted"
-            @change="handleMutedChange"
-          />
-        </label>
-        <label class="live-photo-menu-item">
-          <span>自动播放</span>
-          <input
-            type="checkbox"
-            :checked="livePhotoAutoplay"
-            @change="handleAutoplayChange"
-          />
-        </label>
+    <transition name="live-photo-control">
+      <div v-if="isLivePhoto" class="live-photo-control">
+        <button class="button" type="button" @click="emit('livePhotoReplay')">
+          <svg-icon name="live-photo" :width="20" :height="20" />
+        </button>
+        <div class="live-photo-menu">
+          <label class="live-photo-menu-item">
+            <span>静音</span>
+            <input
+              type="checkbox"
+              :checked="livePhotoMuted"
+              @change="handleMutedChange"
+            />
+          </label>
+          <label class="live-photo-menu-item">
+            <span>自动播放</span>
+            <input
+              type="checkbox"
+              :checked="livePhotoAutoplay"
+              @change="handleAutoplayChange"
+            />
+          </label>
+        </div>
       </div>
-    </div>
+    </transition>
     <div class="button" @click="emit('fullScreenClick')">
       <ArrowsPointingOutIcon class="size-5" />
     </div>
@@ -131,20 +133,31 @@ const handleAutoplayChange = (event: Event) => {
 
 .live-photo-control {
   position: relative;
+}
 
-  &:hover {
-    .live-photo-menu {
-      opacity: 1;
-      pointer-events: auto;
-      transform: translateY(0);
-    }
-  }
+.live-photo-control::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 8px;
+}
+
+.live-photo-control:hover .button {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.live-photo-control:hover .live-photo-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .live-photo-menu {
   position: absolute;
   right: 0;
-  top: 100%;
+  top: calc(100% + 8px);
   width: 152px;
   padding: 8px;
   border-radius: 8px;
@@ -155,6 +168,25 @@ const handleAutoplayChange = (event: Event) => {
   pointer-events: none;
   transform: translateY(-4px);
   transition: all 0.16s ease-out;
+}
+
+.live-photo-control-enter-active,
+.live-photo-control-leave-active {
+  transition:
+    opacity 720ms cubic-bezier(0.76, 0.09, 0.215, 1),
+    transform 720ms cubic-bezier(0.76, 0.09, 0.215, 1);
+}
+
+.live-photo-control-enter-from,
+.live-photo-control-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.live-photo-control-enter-to,
+.live-photo-control-leave-from {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .live-photo-menu-item {

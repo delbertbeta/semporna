@@ -45,7 +45,7 @@ test('getLivePhotoReplayKey changes when play signal changes', () => {
   assert.equal(getLivePhotoReplayKey(5, 1), 'live-photo-5-1');
 });
 
-test('positions live photo hover menu directly below the control', () => {
+test('keeps live photo hover menu reachable with visual spacing', () => {
   const toolbarSource = readFileSync(
     resolve(process.cwd(), 'src/components/album-modal-toolbar.vue'),
     'utf8'
@@ -53,6 +53,35 @@ test('positions live photo hover menu directly below the control', () => {
 
   assert.match(
     toolbarSource,
-    /\.live-photo-menu\s*{[^}]*\btop:\s*100%;/s
+    /\.live-photo-control::after\s*{[^}]*\bheight:\s*8px;/s
+  );
+  assert.match(
+    toolbarSource,
+    /\.live-photo-menu\s*{[^}]*\btop:\s*calc\(100% \+ 8px\);/s
+  );
+});
+
+test('keeps live photo button highlighted while hovering the menu', () => {
+  const toolbarSource = readFileSync(
+    resolve(process.cwd(), 'src/components/album-modal-toolbar.vue'),
+    'utf8'
+  );
+
+  assert.match(
+    toolbarSource,
+    /\.live-photo-control:hover\s+\.button\s*{[^}]*background-color:\s*rgba\(255,\s*255,\s*255,\s*0\.9\);/s
+  );
+});
+
+test('animates live photo control visibility at the slider transition speed', () => {
+  const toolbarSource = readFileSync(
+    resolve(process.cwd(), 'src/components/album-modal-toolbar.vue'),
+    'utf8'
+  );
+
+  assert.match(toolbarSource, /<transition name="live-photo-control">/);
+  assert.match(
+    toolbarSource,
+    /\.live-photo-control-enter-active,[\s\S]*?\.live-photo-control-leave-active\s*{[^}]*720ms/s
   );
 });
