@@ -144,7 +144,7 @@ const handleAutoplayChange = (event: Event) => {
 .live-photo-menu {
   position: absolute;
   right: 0;
-  top: 40px;
+  top: 100%;
   width: 152px;
   padding: 8px;
   border-radius: 8px;

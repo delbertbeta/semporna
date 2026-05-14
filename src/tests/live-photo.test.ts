@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 import {
   canAutoplayLivePhoto,
@@ -41,4 +43,16 @@ test('canAutoplayLivePhoto requires a live photo and enabled autoplay', () => {
 test('getLivePhotoReplayKey changes when play signal changes', () => {
   assert.equal(getLivePhotoReplayKey(5, 0), 'live-photo-5-0');
   assert.equal(getLivePhotoReplayKey(5, 1), 'live-photo-5-1');
+});
+
+test('positions live photo hover menu directly below the control', () => {
+  const toolbarSource = readFileSync(
+    resolve(process.cwd(), 'src/components/album-modal-toolbar.vue'),
+    'utf8'
+  );
+
+  assert.match(
+    toolbarSource,
+    /\.live-photo-menu\s*{[^}]*\btop:\s*100%;/s
+  );
 });
